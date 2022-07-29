@@ -7,6 +7,7 @@ import {
 } from '@aries-framework/core'
 import { HttpInboundTransport } from '@aries-framework/node'
 import morgan from 'morgan'
+import { asyncHandler, errorHandler } from './middleware'
 
 async function startServer(
   agent: Agent,
@@ -16,46 +17,43 @@ async function startServer(
   app.use(morgan(':date[iso] :method :url :response-time'))
   app.set('json spaces', 2)
 
-  app.get('/', async (req, res) => {
-    res.send('Hello, World!')
-  })
+  app.get(
+    '/',
+    asyncHandler(async (req, res) => {
+      res.send('Hello, World!')
+    })
+  )
 
-  app.get('/did', async (req, res) => {
-    const agentDid = agent.publicDid
-    console.log('request to /did', agentDid)
-    res.send(agentDid)
-  })
+  app.get(
+    '/did',
+    asyncHandler(async (req, res) => {
+      const agentDid = agent.publicDid
+      console.log('request to /did', agentDid)
+      res.send(agentDid)
+    })
+  )
 
   // Create new invitation as inviter to invitee
-  app.get('/invitation', async (req, res) => {
-    try {
+  app.get(
+    '/invitation',
+    asyncHandler(async (req, res) => {
       const outOfBandRecord = await agent.oob.createInvitation()
       const { outOfBandInvitation } = outOfBandRecord
       res.send(outOfBandInvitation.toUrl({ domain: 'https://example.com/ssi' }))
-    } catch (error) {
-      if (error instanceof Error) {
-        res.status(500).send(error.message)
-      } else {
-        res.status(500).send('Unrecognized error!')
-      }
-    }
-  })
+    })
+  )
 
-  app.get('/connections', async (req, res) => {
-    try {
+  app.get(
+    '/connections',
+    asyncHandler(async (req, res) => {
       const connectionRecords = await agent.connections.getAll()
       res.status(200).json(connectionRecords)
-    } catch (error) {
-      if (error instanceof Error) {
-        res.status(500).send(error.message)
-      } else {
-        res.status(500).send('Unrecognized error!')
-      }
-    }
-  })
+    })
+  )
 
-  app.get('/issue-credential/:theirDid', async (req, res) => {
-    try {
+  app.get(
+    '/issue-credential/:theirDid',
+    asyncHandler(async (req, res) => {
       const theirDid = req.params.theirDid
       console.log(`Searching connection with theirDid ${theirDid}`)
       const connections = await agent.connections.getAll()
@@ -83,35 +81,24 @@ async function startServer(
         protocolVersion: 'v1',
       })
       res.status(200).json({})
-    } catch (error) {
-      if (error instanceof Error) {
-        res.status(500).send(error.message)
-      } else {
-        res.status(500).send('Unrecognized error!')
-      }
-    }
-  })
+    })
+  )
 
-  app.get('/accept-credential/:credentialId', async (req, res) => {
-    try {
+  app.get(
+    '/accept-credential/:credentialId',
+    asyncHandler(async (req, res) => {
       const credentialId = req.params.credentialId
       await agent.credentials.acceptRequest({
         credentialRecordId: credentialId,
         comment: 'V1 Indy Credential',
       })
       res.status(200).json({ credentialId })
-    } catch (error) {
-      console.error(error)
-      if (error instanceof Error) {
-        res.status(500).send(error.message)
-      } else {
-        res.status(500).send('Unrecognized error!')
-      }
-    }
-  })
+    })
+  )
 
-  app.get('/register-schema', async (req, res) => {
-    try {
+  app.get(
+    '/register-schema',
+    asyncHandler(async (req, res) => {
       const template = {
         attributes: ['name', 'age'],
         name: `test-schema`,
@@ -119,18 +106,12 @@ async function startServer(
       }
       const schema = await agent.ledger.registerSchema(template)
       res.status(200).json({ schema })
-    } catch (error) {
-      console.error(error)
-      if (error instanceof Error) {
-        res.status(500).send(error.message)
-      } else {
-        res.status(500).send('Unrecognized error!')
-      }
-    }
-  })
+    })
+  )
 
-  app.get('/register-definition', async (req, res) => {
-    try {
+  app.get(
+    '/register-definition',
+    asyncHandler(async (req, res) => {
       const schema = await agent.ledger.getSchema(
         '9gFCquotxSS7ctKG1GJatU:2:test-schema:1.0'
       )
@@ -145,18 +126,13 @@ async function startServer(
         definitionTemplate
       )
       res.status(200).json({ definition })
-    } catch (error) {
-      console.error(error)
-      if (error instanceof Error) {
-        res.status(500).send(error.message)
-      } else {
-        res.status(500).send('Unrecognized error!')
-      }
-    }
-  })
+    })
+  )
 
   agent.registerInboundTransport(new HttpInboundTransport({ app, port }))
   agent.registerOutboundTransport(new HttpOutboundTransport())
+
+  app.use(errorHandler)
 
   await agent.initialize()
 }
