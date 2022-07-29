@@ -71,6 +71,7 @@ async function startServer(
           },
         },
         protocolVersion: 'v1',
+        autoAcceptCredential: AutoAcceptCredential.ContentApproved,
       })
       res.status(200).json({})
     })
