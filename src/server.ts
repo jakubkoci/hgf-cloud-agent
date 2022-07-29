@@ -1,6 +1,7 @@
 import express from 'express'
 import {
   Agent,
+  AutoAcceptCredential,
   CredentialDefinitionTemplate,
   HttpOutboundTransport,
   V1CredentialPreview,
@@ -52,18 +53,9 @@ async function startServer(
   )
 
   app.get(
-    '/issue-credential/:theirDid',
+    '/issue-credential/:connectionId',
     asyncHandler(async (req, res) => {
-      const theirDid = req.params.theirDid
-      console.log(`Searching connection with theirDid ${theirDid}`)
-      const connections = await agent.connections.getAll()
-      const connection = connections.find((c) => c.theirDid === theirDid)
-      if (!connection) {
-        throw new Error(`Connection with theirDid ${theirDid} was not found.`)
-      }
-      const connectionId = connection?.id
-      console.log(`Connection with ID ${connectionId} was found`)
-
+      const connectionId = req.params.connectionId
       const credDefId = '9gFCquotxSS7ctKG1GJatU:3:CL:303:default'
       const credentialPreview = V1CredentialPreview.fromRecord({
         name: 'John',
