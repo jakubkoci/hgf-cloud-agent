@@ -1,9 +1,13 @@
 import express from 'express'
 import {
   Agent,
+  AttributeFilter,
   AutoAcceptCredential,
   CredentialDefinitionTemplate,
   HttpOutboundTransport,
+  PredicateType,
+  ProofAttributeInfo,
+  ProofPredicateInfo,
   V1CredentialPreview,
 } from '@aries-framework/core'
 import { HttpInboundTransport } from '@aries-framework/node'
@@ -61,7 +65,7 @@ async function startServer(
         name: 'John',
         age: '99',
       })
-      await agent.credentials.offerCredential({
+      const credentialExchangeRecord = await agent.credentials.offerCredential({
         comment: 'some comment about credential',
         connectionId,
         credentialFormats: {
@@ -73,19 +77,55 @@ async function startServer(
         protocolVersion: 'v1',
         autoAcceptCredential: AutoAcceptCredential.ContentApproved,
       })
-      res.status(200).json({})
+      res.status(200).json({ credentialExchangeRecord })
     })
   )
 
   app.get(
-    '/accept-credential/:credentialId',
+    '/request-proof/:connectionId',
     asyncHandler(async (req, res) => {
-      const credentialId = req.params.credentialId
-      await agent.credentials.acceptRequest({
-        credentialRecordId: credentialId,
-        comment: 'V1 Indy Credential',
+      const connectionId = req.params.connectionId
+      const credDefId = '9gFCquotxSS7ctKG1GJatU:3:CL:303:default'
+
+      const attributes = {
+        name: new ProofAttributeInfo({
+          name: 'name',
+          restrictions: [
+            new AttributeFilter({
+              credentialDefinitionId: credDefId,
+            }),
+          ],
+        }),
+      }
+
+      // Sample predicates
+      const predicates = {
+        age: new ProofPredicateInfo({
+          name: 'age',
+          predicateType: PredicateType.GreaterThanOrEqualTo,
+          predicateValue: 50,
+          restrictions: [
+            new AttributeFilter({
+              credentialDefinitionId: credDefId,
+            }),
+          ],
+        }),
+      }
+
+      const proofRecord = await agent.proofs.requestProof(connectionId, {
+        name: 'test-proof-request',
+        requestedAttributes: attributes,
+        requestedPredicates: predicates,
       })
-      res.status(200).json({ credentialId })
+      res.status(200).json({ proofRecord })
+    })
+  )
+
+  app.get(
+    '/proofs',
+    asyncHandler(async (req, res) => {
+      const proofRecords = await agent.proofs.getAll()
+      res.status(200).json(proofRecords)
     })
   )
 
