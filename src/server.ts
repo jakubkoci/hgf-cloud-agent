@@ -12,6 +12,7 @@ import {
 } from '@aries-framework/core'
 import { HttpInboundTransport } from '@aries-framework/node'
 import morgan from 'morgan'
+import cors from 'cors'
 import { asyncHandler, errorHandler } from './middleware'
 
 async function startServer(
@@ -20,6 +21,7 @@ async function startServer(
 ): Promise<void> {
   const app = express()
   app.use(morgan(':date[iso] :method :url :response-time'))
+  app.use(cors())
   app.set('json spaces', 2)
 
   app.get(
@@ -49,10 +51,26 @@ async function startServer(
   )
 
   app.get(
+    '/oobs',
+    asyncHandler(async (req, res) => {
+      const outOfBandRecords = await agent.oob.getAll()
+      res.status(200).json(outOfBandRecords)
+    })
+  )
+
+  app.get(
     '/connections',
     asyncHandler(async (req, res) => {
       const connectionRecords = await agent.connections.getAll()
       res.status(200).json(connectionRecords)
+    })
+  )
+
+  app.get(
+    '/credentials',
+    asyncHandler(async (req, res) => {
+      const credentialRecords = await agent.credentials.getAll()
+      res.status(200).json(credentialRecords)
     })
   )
 
