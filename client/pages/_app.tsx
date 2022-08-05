@@ -2,6 +2,9 @@ import { createTheme, NextUIProvider } from '@nextui-org/react'
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 import Layout from '../components/Layout'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
 
 function MyApp({ Component, pageProps }: AppProps) {
   const theme = createTheme({
@@ -34,11 +37,13 @@ function MyApp({ Component, pageProps }: AppProps) {
   })
 
   return (
-    <NextUIProvider theme={theme}>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-    </NextUIProvider>
+    <QueryClientProvider client={queryClient}>
+      <NextUIProvider theme={theme}>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </NextUIProvider>
+    </QueryClientProvider>
   )
 }
 
