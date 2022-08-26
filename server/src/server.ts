@@ -15,6 +15,9 @@ import morgan from 'morgan'
 import cors from 'cors'
 import { asyncHandler, errorHandler } from './middleware'
 
+const schemaId = '9gFCquotxSS7ctKG1GJatU:2:test-schema:1.0'
+const credentialDefinitionId = '9gFCquotxSS7ctKG1GJatU:3:CL:12:default'
+
 async function startServer(
   agent: Agent,
   { port }: { port: number }
@@ -78,7 +81,8 @@ async function startServer(
     '/issue-credential/:connectionId',
     asyncHandler(async (req, res) => {
       const connectionId = req.params.connectionId
-      const credDefId = '9gFCquotxSS7ctKG1GJatU:3:CL:303:default'
+      console.log('connectionId', connectionId)
+
       const credentialPreview = V1CredentialPreview.fromRecord({
         name: 'John',
         age: '99',
@@ -89,7 +93,7 @@ async function startServer(
         credentialFormats: {
           indy: {
             attributes: credentialPreview.attributes,
-            credentialDefinitionId: credDefId,
+            credentialDefinitionId,
           },
         },
         protocolVersion: 'v1',
@@ -103,14 +107,13 @@ async function startServer(
     '/request-proof/:connectionId',
     asyncHandler(async (req, res) => {
       const connectionId = req.params.connectionId
-      const credDefId = '9gFCquotxSS7ctKG1GJatU:3:CL:303:default'
 
       const attributes = {
         name: new ProofAttributeInfo({
           name: 'name',
           restrictions: [
             new AttributeFilter({
-              credentialDefinitionId: credDefId,
+              credentialDefinitionId,
             }),
           ],
         }),
@@ -124,7 +127,7 @@ async function startServer(
           predicateValue: 50,
           restrictions: [
             new AttributeFilter({
-              credentialDefinitionId: credDefId,
+              credentialDefinitionId,
             }),
           ],
         }),
@@ -163,9 +166,7 @@ async function startServer(
   app.get(
     '/register-definition',
     asyncHandler(async (req, res) => {
-      const schema = await agent.ledger.getSchema(
-        '9gFCquotxSS7ctKG1GJatU:2:test-schema:1.0'
-      )
+      const schema = await agent.ledger.getSchema(schemaId)
       const definitionTemplate: CredentialDefinitionTemplate = {
         schema,
         signatureType: 'CL',
