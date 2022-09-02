@@ -15,9 +15,6 @@ import morgan from 'morgan'
 import cors from 'cors'
 import { asyncHandler, errorHandler } from './middleware'
 
-const schemaId = '9gFCquotxSS7ctKG1GJatU:2:test-schema:1.0'
-const credentialDefinitionId = '9gFCquotxSS7ctKG1GJatU:3:CL:12:default'
-
 async function startServer(
   agent: Agent,
   { port }: { port: number }
@@ -26,6 +23,9 @@ async function startServer(
   app.use(morgan(':date[iso] :method :url :response-time'))
   app.use(cors())
   app.set('json spaces', 2)
+
+  let schemaId = process.env.SCHEMA_ID
+  let credentialDefinitionId = ''
 
   app.get(
     '/',
@@ -83,6 +83,10 @@ async function startServer(
       const connectionId = req.params.connectionId
       console.log('connectionId', connectionId)
 
+      if (!credentialDefinitionId) {
+        throw new Error('Credential definition is missing.')
+      }
+
       const credentialPreview = V1CredentialPreview.fromRecord({
         name: 'John',
         age: '99',
@@ -107,6 +111,10 @@ async function startServer(
     '/request-proof/:connectionId',
     asyncHandler(async (req, res) => {
       const connectionId = req.params.connectionId
+
+      if (!credentialDefinitionId) {
+        throw new Error('Credential definition is missing.')
+      }
 
       const attributes = {
         name: new ProofAttributeInfo({
@@ -151,6 +159,16 @@ async function startServer(
   )
 
   app.get(
+    '/schemas',
+    asyncHandler(async (req, res) => {
+      res.status(200).json({
+        schemaId,
+        credentialDefinitionId,
+      })
+    })
+  )
+
+  app.get(
     '/register-schema',
     asyncHandler(async (req, res) => {
       const template = {
@@ -159,6 +177,7 @@ async function startServer(
         version: '1.0',
       }
       const schema = await agent.ledger.registerSchema(template)
+      schemaId = schema.id
       res.status(200).json({ schema })
     })
   )
@@ -166,6 +185,7 @@ async function startServer(
   app.get(
     '/register-definition',
     asyncHandler(async (req, res) => {
+      if (!schemaId) throw new Error('Schema ID is missing.')
       const schema = await agent.ledger.getSchema(schemaId)
       const definitionTemplate: CredentialDefinitionTemplate = {
         schema,
@@ -177,6 +197,7 @@ async function startServer(
       const definition = await agent.ledger.registerCredentialDefinition(
         definitionTemplate
       )
+      credentialDefinitionId = definition.id
       res.status(200).json({ definition })
     })
   )

@@ -17,9 +17,25 @@ import {
 } from '@aries-framework/core'
 import { agentDependencies } from '@aries-framework/node'
 import fetch from 'node-fetch-commonjs'
-import { pool_transactions_localhost_genesis } from './src/txns'
+import {
+  pool_transactions_buildernet_genesis,
+  pool_transactions_localhost_genesis,
+} from './src/txns'
 
 config()
+
+export const ledgers = {
+  localhost: {
+    id: `pool-localhost-integration`,
+    isProduction: false,
+    genesisTransactions: pool_transactions_localhost_genesis,
+  },
+  buildernet: {
+    id: `pool-buildernet-integration`,
+    isProduction: false,
+    genesisTransactions: pool_transactions_buildernet_genesis,
+  },
+}
 
 const cloudAgentUrl = process.env.AGENT_ENDPOINTS
 
@@ -34,13 +50,7 @@ const agentConfig = {
   mediatorPickupStrategy: MediatorPickupStrategy.PickUpV1,
   logger: new ConsoleLogger(LogLevel.trace),
   connectToIndyLedgersOnStartup: false,
-  indyLedgers: [
-    {
-      id: `pool-localhost`,
-      isProduction: false,
-      genesisTransactions: pool_transactions_localhost_genesis,
-    },
-  ],
+  indyLedgers: [ledgers.buildernet],
   autoAcceptCredentials: AutoAcceptCredential.ContentApproved,
 }
 

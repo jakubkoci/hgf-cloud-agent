@@ -6,9 +6,33 @@ import {
   LogLevel,
 } from '@aries-framework/core'
 import dotenv from 'dotenv-safe'
-import { pool_transactions_localhost_genesis } from './txns'
+import {
+  pool_transactions_buildernet_genesis,
+  pool_transactions_localhost_genesis,
+} from './txns'
 
 dotenv.config()
+
+const ledgers = {
+  localhost: {
+    id: `pool-localhost-cloud-agent`,
+    isProduction: false,
+    genesisTransactions: pool_transactions_localhost_genesis,
+    transactionAuthorAgreement: {
+      version: '1',
+      acceptanceMechanism: 'accept',
+    },
+  },
+  buildernet: {
+    id: `pool-buildernet-cloud-agent`,
+    isProduction: false,
+    genesisTransactions: pool_transactions_buildernet_genesis,
+    transactionAuthorAgreement: {
+      version: '0.1',
+      acceptanceMechanism: 'service_agreement',
+    },
+  },
+}
 
 function createAgent(): Agent {
   const agentConfig: InitConfig = {
@@ -23,17 +47,9 @@ function createAgent(): Agent {
     autoAcceptConnections: true,
     autoAcceptMediationRequests: true,
     logger: new ConsoleLogger(LogLevel.debug),
-    indyLedgers: [
-      {
-        id: `pool-localhost`,
-        isProduction: false,
-        genesisTransactions: pool_transactions_localhost_genesis,
-        transactionAuthorAgreement: {
-          version: '1',
-          acceptanceMechanism: 'accept',
-        },
-      },
-    ],
+    // @ts-ignore: I don't understand why TS complains here with the messaage "Type 'string' is not
+    // assignable to type '`${number}` | `${number}.${number}`'"
+    indyLedgers: [ledgers.buildernet],
   }
   return new Agent(agentConfig, agentDependencies)
 }
