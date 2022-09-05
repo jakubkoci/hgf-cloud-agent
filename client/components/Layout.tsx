@@ -10,13 +10,14 @@ import {
 } from '@nextui-org/react'
 import Head from 'next/head'
 import { ReactElement, useEffect, useState } from 'react'
+import { cloudAgentUrl } from '../constants'
 
 export default function Layout({ children }: { children: ReactElement }) {
   const [did, setDid] = useState('')
 
   useEffect(() => {
     // setLoading(true)
-    fetch('http://localhost:3001/did')
+    fetch(`${cloudAgentUrl}/did`)
       .then((res) => res.json())
       .then((data) => {
         setDid(data.did)

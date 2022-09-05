@@ -12,8 +12,7 @@ import {
 } from '@nextui-org/react'
 import { useQuery } from '@tanstack/react-query'
 import { QRCodeSVG } from 'qrcode.react'
-
-const cloudAgentUrl = process.env.CLOUD_AGENT_API_URL ?? 'http://localhost:3001'
+import { cloudAgentUrl } from '../constants'
 
 interface ConnectionModel {
   id: string
