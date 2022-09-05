@@ -1,6 +1,4 @@
 
-# TODO: adapt so we can run it from the src files outside of the container
-#  https://github.com/TimoGlastra/afj-reproduction-template
 FROM ubuntu:18.04 as base
 
 ENV DEBIAN_FRONTEND noninteractive

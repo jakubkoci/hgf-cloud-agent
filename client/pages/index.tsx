@@ -13,7 +13,7 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { QRCodeSVG } from 'qrcode.react'
 
-const cloudAgentUrl = 'http://localhost:3001'
+const cloudAgentUrl = process.env.CLOUD_AGENT_API_URL ?? 'http://localhost:3001'
 
 interface ConnectionModel {
   id: string

@@ -1,0 +1,12 @@
+{
+  "name": "hgf-cloud-agent",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "build:client": "yarn workspace client build",
+    "build:server": "yarn workspace server build"
+  }
+}
