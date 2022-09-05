@@ -4,13 +4,13 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf build && tsc",
     "lint": "eslint .",
     "format:check": "prettier --check .",
     "format:update": "prettier --write .",
     "test": "jest",
     "test:watch": "yarn test --watchAll",
-    "start": "rm -rf build && tsc && node ./build/src/main.js"
+    "start": "node ./build/src/main.js"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
