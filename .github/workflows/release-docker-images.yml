@@ -39,7 +39,7 @@ jobs:
           context: ./client
           push: true
           tags: ghcr.io/jakubkoci/hgf-cloud-agent/client:latest
-          build-args:
+          build-args: |
             CLOUD_AGENT_API_URL: ${{ secrets.CLOUD_AGENT_API_URL }}
 
       - name: Build and push server docker image
