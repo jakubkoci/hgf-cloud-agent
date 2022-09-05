@@ -32,7 +32,7 @@ const ledgers = {
       acceptanceMechanism: 'service_agreement',
     },
   },
-}
+} as const
 
 function createAgent(): Agent {
   const agentConfig: InitConfig = {
@@ -47,8 +47,6 @@ function createAgent(): Agent {
     autoAcceptConnections: true,
     autoAcceptMediationRequests: true,
     logger: new ConsoleLogger(LogLevel.debug),
-    // @ts-ignore: I don't understand why TS complains here with the messaage "Type 'string' is not
-    // assignable to type '`${number}` | `${number}.${number}`'"
     indyLedgers: [ledgers.buildernet],
   }
   return new Agent(agentConfig, agentDependencies)
