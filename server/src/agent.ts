@@ -28,7 +28,7 @@ const ledgers = {
     isProduction: false,
     genesisTransactions: pool_transactions_buildernet_genesis,
     transactionAuthorAgreement: {
-      version: '0.1',
+      version: '2.0',
       acceptanceMechanism: 'service_agreement',
     },
   },

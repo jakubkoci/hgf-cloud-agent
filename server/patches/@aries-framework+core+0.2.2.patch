@@ -1,0 +1,13 @@
+diff --git a/node_modules/@aries-framework/core/build/modules/ledger/services/IndyLedgerService.js b/node_modules/@aries-framework/core/build/modules/ledger/services/IndyLedgerService.js
+index 680d557..7f57b4e 100644
+--- a/node_modules/@aries-framework/core/build/modules/ledger/services/IndyLedgerService.js
++++ b/node_modules/@aries-framework/core/build/modules/ledger/services/IndyLedgerService.js
+@@ -321,7 +321,7 @@ let IndyLedgerService = class IndyLedgerService {
+                 throw new LedgerError_1.LedgerError(`Please, specify a transaction author agreement with version and acceptance mechanism. ${JSON.stringify(authorAgreement)}`);
+             }
+             // Throw an error if the pool doesn't have the specified version and acceptance mechanism
+-            if (authorAgreement.acceptanceMechanisms.version !== taa.version ||
++            if (authorAgreement.version !== taa.version ||
+                 !(taa.acceptanceMechanism in authorAgreement.acceptanceMechanisms.aml)) {
+                 // Throw an error with a helpful message
+                 const errMessage = `Unable to satisfy matching TAA with mechanism ${JSON.stringify(taa.acceptanceMechanism)} and version ${JSON.stringify(taa.version)} in pool.\n Found ${JSON.stringify(Object.keys(authorAgreement.acceptanceMechanisms.aml))} and version ${authorAgreement.acceptanceMechanisms.version} in pool.`;
