@@ -38,13 +38,13 @@ FROM base as final
 # AFJ specifc setup
 WORKDIR /www
 
-COPY yarn.lock yarn.lock
 COPY package.json package.json
 
 RUN yarn install
 
 # Copy dependencies
 COPY . .
+RUN npx patch-package
 
 RUN yarn build
 
