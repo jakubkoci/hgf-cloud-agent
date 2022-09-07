@@ -68,6 +68,9 @@ const ConnectionDetail: NextPage = () => {
         <Spacer y={1} />
 
         <CredentialList connectionId={connection.id} />
+        <Spacer y={1} />
+
+        <ProofList connectionId={connection.id} />
       </Container>
     </>
   )
@@ -112,16 +115,76 @@ function CredentialList({ connectionId }: { connectionId: string }) {
         <Table.Header>
           <Table.Column>ID</Table.Column>
           <Table.Column>Date</Table.Column>
-          <Table.Column>Status</Table.Column>
+          <Table.Column>State</Table.Column>
           <Table.Column>Actions</Table.Column>
         </Table.Header>
         <Table.Body>
           {credentialsQuery.data.map((credential: CredentialModel) => {
             return (
-              <Table.Row key="1">
+              <Table.Row key={credential.id}>
                 <Table.Cell>{credential.id}</Table.Cell>
                 <Table.Cell>{credential.createdAt}</Table.Cell>
                 <Table.Cell>{credential.state}</Table.Cell>
+                <Table.Cell>
+                  <Link href="#">
+                    <Button>Detail</Button>
+                  </Link>
+                </Table.Cell>
+              </Table.Row>
+            )
+          })}
+        </Table.Body>
+      </Table>
+    </>
+  )
+}
+
+function ProofList({ connectionId }: { connectionId: string }) {
+  const proofsQuery = useQuery(
+    ['proofs'],
+    async () => {
+      const proofs = await get(`${cloudAgentUrl}/proofs`)
+      return proofs.filter(
+        (proof: CredentialModel) => proof.connectionId === connectionId
+      )
+    },
+    {
+      placeholderData: [],
+      refetchInterval: 2000,
+    }
+  )
+
+  return (
+    <>
+      <Row justify="space-between" align="center">
+        <Text h2>Proofs</Text>
+        <Button
+          onPress={() => get(`${cloudAgentUrl}/request-proof/${connectionId}`)}
+        >
+          Request Proof
+        </Button>
+      </Row>
+      <Table
+        lined
+        headerLined
+        css={{
+          height: 'auto',
+          minWidth: '100%',
+        }}
+      >
+        <Table.Header>
+          <Table.Column>ID</Table.Column>
+          <Table.Column>Date</Table.Column>
+          <Table.Column>State</Table.Column>
+          <Table.Column>Actions</Table.Column>
+        </Table.Header>
+        <Table.Body>
+          {proofsQuery.data.map((proof: CredentialModel) => {
+            return (
+              <Table.Row key="1">
+                <Table.Cell>{proof.id}</Table.Cell>
+                <Table.Cell>{proof.createdAt}</Table.Cell>
+                <Table.Cell>{proof.state}</Table.Cell>
                 <Table.Cell>
                   <Link href="#">
                     <Button>Detail</Button>
