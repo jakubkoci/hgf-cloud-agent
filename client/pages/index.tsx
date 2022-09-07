@@ -13,6 +13,7 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { QRCodeSVG } from 'qrcode.react'
 import { cloudAgentUrl } from '../constants'
+import { fromBase64Url, toBase64Url } from '../utils'
 
 interface ConnectionModel {
   id: string
@@ -26,6 +27,7 @@ interface InvitationModel {
   id: string
   createdAt: string
   state: string
+  outOfBandInvitation: Record<string, unknown>
 }
 
 const fetchInvitations = async () => {
@@ -44,28 +46,6 @@ const fetchConnections = async () => {
   return response.json()
 }
 
-const invitationJson = {
-  '@type': 'https://didcomm.org/out-of-band/1.1/invitation',
-  '@id': 'b37f3e29-7edc-49e5-a54e-35dfa36e304e',
-  label: 'HgfCloudAgent',
-  accept: ['didcomm/aip1', 'didcomm/aip2;env=rfc19'],
-  handshake_protocols: [
-    'https://didcomm.org/didexchange/1.0',
-    'https://didcomm.org/connections/1.0',
-  ],
-  services: [
-    {
-      id: '#inline-0',
-      serviceEndpoint: 'http://localhost:3001',
-      type: 'did-communication',
-      recipientKeys: [
-        'did:key:z6Mkiriy7saK7fvquBqguStSsUWTBYVEUYUiLymNDD52ZJa5',
-      ],
-      routingKeys: [],
-    },
-  ],
-}
-
 const Connections: NextPage = () => {
   const connectionsQuery = useQuery(['connections'], fetchConnections, {
     placeholderData: [],
@@ -77,52 +57,31 @@ const Connections: NextPage = () => {
   })
   const [invitationUrl, setInvitationUrl] = useState('')
 
-  const [visible, setVisible] = useState(false)
-  const handler = async () => {
+  const getInvitation = async () => {
     const response = await fetch(`${cloudAgentUrl}/invitation`)
     const invitationUrl = await response.text()
-    setInvitationUrl(invitationUrl)
-    setVisible(true)
+    openModal(invitationUrl)
   }
 
-  const closeHandler = () => {
-    setVisible(false)
-    console.log('closed')
+  const openModal = (invitationUrl: string) => {
+    setInvitationUrl(invitationUrl)
+  }
+
+  const closeModal = () => {
+    setInvitationUrl('')
   }
 
   return (
     <>
       <Container>
+        <InvitationModal
+          visible={!!invitationUrl}
+          invitationUrl={invitationUrl}
+          onClose={closeModal}
+        />
         <Row justify="space-between" align="center">
           <Text h1>Invitations</Text>
-          <Button onClick={handler}>Add Connection</Button>
-          <Modal
-            width="650px"
-            closeButton
-            scroll
-            preventClose
-            aria-labelledby="modal-title"
-            open={visible}
-            onClose={closeHandler}
-          >
-            <Modal.Header>
-              <Text id="modal-title" size={18}>
-                New Out-of-band Invitation
-              </Text>
-            </Modal.Header>
-            <Modal.Body>
-              <Text css={{ wordBreak: 'break-all' }}>{invitationUrl}</Text>
-              <Text css={{ wordBreak: 'break-all' }}>
-                {JSON.stringify(invitationJson, null, 2)}
-              </Text>
-              <QRCodeSVG size={300} value={invitationUrl} />
-            </Modal.Body>
-            <Modal.Footer>
-              <Button auto flat color="error" onClick={closeHandler}>
-                Close
-              </Button>
-            </Modal.Footer>
-          </Modal>
+          <Button onClick={getInvitation}>Create Invitation</Button>
         </Row>
         <Spacer y={1} />
 
@@ -137,21 +96,29 @@ const Connections: NextPage = () => {
           }}
         >
           <Table.Header>
+            <Table.Column>ID</Table.Column>
             <Table.Column>Date</Table.Column>
             <Table.Column>Status</Table.Column>
             <Table.Column>&nbsp;</Table.Column>
           </Table.Header>
           <Table.Body>
             {invitationsQuery.data.map((invitation: InvitationModel) => {
+              const invitationUrl = `${cloudAgentUrl}?oob=${toBase64Url(
+                invitation.outOfBandInvitation
+              )}`
+
               return (
                 <Table.Row key={invitation.id}>
+                  <Table.Cell>{invitation.id}</Table.Cell>
                   <Table.Cell>{invitation.createdAt}</Table.Cell>
                   <Table.Cell>{invitation.state}</Table.Cell>
                   <Table.Cell
                     css={{ display: 'flex', justifyContent: 'flex-end' }}
                   >
                     <Link href={`#`}>
-                      <Button>Show Invitation</Button>
+                      <Button onClick={() => openModal(invitationUrl)}>
+                        Show Invitation
+                      </Button>
                     </Link>
                   </Table.Cell>
                 </Table.Row>
@@ -204,6 +171,62 @@ const Connections: NextPage = () => {
         </Table>
       </Container>
     </>
+  )
+}
+
+function InvitationModal({
+  visible,
+  invitationUrl,
+  onClose,
+}: {
+  visible: boolean
+  invitationUrl: string
+  onOpen?: () => void
+  onClose: () => void
+}) {
+  return (
+    <Modal
+      width="650px"
+      closeButton
+      scroll
+      preventClose
+      aria-labelledby="modal-title"
+      open={visible}
+      onClose={onClose}
+    >
+      <Modal.Header>
+        <Text h2 id="modal-title">
+          Out-of-band Invitation
+        </Text>
+      </Modal.Header>
+      <Modal.Body>
+        <Text h3 id="modal-title">
+          QR Code
+        </Text>
+        <Row justify="center">
+          {invitationUrl && <QRCodeSVG size={400} value={invitationUrl} />}
+        </Row>
+        <Text h3 id="modal-title">
+          URL
+        </Text>
+        <Row>
+          <Text css={{ wordBreak: 'break-all' }}>{invitationUrl}</Text>
+        </Row>
+        <Text h3 id="modal-title">
+          JSON
+        </Text>
+        <Row>
+          <Text css={{ wordBreak: 'break-all' }}>
+            {JSON.stringify(fromBase64Url(invitationUrl), null, 2)}
+          </Text>
+        </Row>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button auto flat color="error" onClick={onClose}>
+          Close
+        </Button>
+      </Modal.Footer>
+    </Modal>
   )
 }
 
