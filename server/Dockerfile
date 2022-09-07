@@ -42,10 +42,7 @@ COPY package.json package.json
 
 RUN yarn install
 
-# Copy dependencies
-COPY . .
+COPY patches patches
 RUN npx patch-package
 
-RUN yarn build
-
-CMD ["yarn", "start"]
+CMD ["yarn", "start:watch"]
