@@ -10,8 +10,6 @@ export function toBase64Url(json: Record<string, unknown>) {
 export function fromBase64Url(url: string) {
   if (url) {
     const [, base64Url] = url.split('?oob=')
-    console.log("url.split('?oob=')", url.split('?oob='))
-    console.log('base64Url', base64Url)
     const json = JSON.parse(
       Buffer.from(Buffer.from(base64Url, 'base64')).toString('utf-8')
     )

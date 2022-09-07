@@ -31,14 +31,6 @@ interface InvitationModel {
 }
 
 const Connections: NextPage = () => {
-  const connectionsQuery = useQuery(
-    ['connections'],
-    () => get(`${cloudAgentUrl}/connections`),
-    {
-      placeholderData: [],
-      refetchInterval: 2000,
-    }
-  )
   const invitationsQuery = useQuery(
     ['invitations'],
     () => get(`${cloudAgentUrl}/oobs`),
@@ -47,6 +39,15 @@ const Connections: NextPage = () => {
       refetchInterval: 2000,
     }
   )
+  const connectionsQuery = useQuery(
+    ['connections'],
+    () => get(`${cloudAgentUrl}/connections`),
+    {
+      placeholderData: [],
+      refetchInterval: 2000,
+    }
+  )
+
   const [invitationUrl, setInvitationUrl] = useState('')
 
   const getInvitation = async () => {
@@ -81,7 +82,6 @@ const Connections: NextPage = () => {
           lined
           headerLined
           shadow={true}
-          aria-label="Example static collection table"
           css={{
             height: 'auto',
             minWidth: '100%',

@@ -8,9 +8,12 @@ import {
   Table,
   Text,
 } from '@nextui-org/react'
+import { useQuery } from '@tanstack/react-query'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { cloudAgentUrl } from '../../constants'
+import { get } from '../../utils'
 
 interface ConnectionModel {
   id: string
@@ -20,9 +23,15 @@ interface ConnectionModel {
   state: string
 }
 
+interface CredentialModel {
+  id: string
+  createdAt: string
+  state: string
+  connectionId: string
+}
+
 const ConnectionDetail: NextPage = () => {
   const [connection, setConnection] = useState({ id: '' })
-  const [credentials, setCredentials] = useState([])
   const [isLoading, setLoading] = useState(false)
   const router = useRouter()
   const { connectionId } = router.query
@@ -36,11 +45,6 @@ const ConnectionDetail: NextPage = () => {
         console.log(connections)
         const connection = connections.find((connection: ConnectionModel) => {
           console.log('connection', connection)
-          console.log('connectionId', connectionId)
-          console.log(
-            'connection.id === connectionId',
-            connection.id === connectionId
-          )
           return connection.id === connectionId
         })
         if (connection) {
@@ -63,46 +67,71 @@ const ConnectionDetail: NextPage = () => {
         </Card>
         <Spacer y={1} />
 
-        <Row justify="space-between" align="center">
-          <Text h2>Credentials</Text>
-          <Button>Issue Credential</Button>
-        </Row>
-        <Table
-          lined
-          headerLined
-          aria-label="Example static collection table"
-          css={{
-            height: 'auto',
-            minWidth: '100%',
-          }}
-        >
-          <Table.Header>
-            <Table.Column>Date</Table.Column>
-            <Table.Column>DID</Table.Column>
-            <Table.Column>Status</Table.Column>
-            <Table.Column>Actions</Table.Column>
-          </Table.Header>
-          <Table.Body>
-            {credentials.map((connection: ConnectionModel) => {
-              return (
-                <Table.Row key="1">
-                  <Table.Cell>{connection.createdAt}</Table.Cell>
-                  <Table.Cell>
-                    <Text>{connection.did}</Text>
-                    <Text>{connection.theirDid}</Text>
-                  </Table.Cell>
-                  <Table.Cell>{connection.state}</Table.Cell>
-                  <Table.Cell>
-                    <Link href={`/connection/${connection.id}`}>
-                      <Button>Detail</Button>
-                    </Link>
-                  </Table.Cell>
-                </Table.Row>
-              )
-            })}
-          </Table.Body>
-        </Table>
+        <CredentialList connectionId={connection.id} />
       </Container>
+    </>
+  )
+}
+
+function CredentialList({ connectionId }: { connectionId: string }) {
+  const credentialsQuery = useQuery(
+    ['credentials'],
+    async () => {
+      const credentials = await get(`${cloudAgentUrl}/credentials`)
+      return credentials.filter(
+        (credential: CredentialModel) =>
+          credential.connectionId === connectionId
+      )
+    },
+    {
+      placeholderData: [],
+      refetchInterval: 2000,
+    }
+  )
+
+  return (
+    <>
+      <Row justify="space-between" align="center">
+        <Text h2>Credentials</Text>
+        <Button
+          onPress={() =>
+            get(`${cloudAgentUrl}/issue-credential/${connectionId}`)
+          }
+        >
+          Issue Credential
+        </Button>
+      </Row>
+      <Table
+        lined
+        headerLined
+        css={{
+          height: 'auto',
+          minWidth: '100%',
+        }}
+      >
+        <Table.Header>
+          <Table.Column>ID</Table.Column>
+          <Table.Column>Date</Table.Column>
+          <Table.Column>Status</Table.Column>
+          <Table.Column>Actions</Table.Column>
+        </Table.Header>
+        <Table.Body>
+          {credentialsQuery.data.map((credential: CredentialModel) => {
+            return (
+              <Table.Row key="1">
+                <Table.Cell>{credential.id}</Table.Cell>
+                <Table.Cell>{credential.createdAt}</Table.Cell>
+                <Table.Cell>{credential.state}</Table.Cell>
+                <Table.Cell>
+                  <Link href="#">
+                    <Button>Detail</Button>
+                  </Link>
+                </Table.Cell>
+              </Table.Row>
+            )
+          })}
+        </Table.Body>
+      </Table>
     </>
   )
 }
