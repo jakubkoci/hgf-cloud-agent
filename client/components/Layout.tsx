@@ -1,29 +1,41 @@
 import {
+  Button,
   Card,
   Col,
   Container,
   Image,
-  Link,
+  Loading,
   Row,
   Spacer,
   Text,
 } from '@nextui-org/react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import Head from 'next/head'
-import { ReactElement, useEffect, useState } from 'react'
+import { ReactElement } from 'react'
 import { cloudAgentUrl } from '../constants'
+import { get } from '../utils'
 
 export default function Layout({ children }: { children: ReactElement }) {
-  const [did, setDid] = useState('')
+  const queryClient = useQueryClient()
 
-  useEffect(() => {
-    // setLoading(true)
-    fetch(`${cloudAgentUrl}/did`)
-      .then((res) => res.json())
-      .then((data) => {
-        setDid(data.did)
-        // setLoading(false)
-      })
-  }, [])
+  const didQuery = useQuery(['did'], () => get(`${cloudAgentUrl}/did`), {
+    placeholderData: {},
+  })
+  const schemasQuery = useQuery(
+    ['schemas'],
+    () => get(`${cloudAgentUrl}/schemas`),
+    {
+      placeholderData: {},
+    }
+  )
+  const registerDefinitionQuery = useQuery(
+    ['register-definition'],
+    () => get(`${cloudAgentUrl}/register-definition`),
+    {
+      refetchOnWindowFocus: false,
+      enabled: false,
+    }
+  )
 
   return (
     <Container display="flex">
@@ -35,7 +47,7 @@ export default function Layout({ children }: { children: ReactElement }) {
       <Card css={{ $$cardColor: '$colors$gradient' }}>
         <Card.Body>
           <Row justify="space-between" align="center">
-            <Col span={3}>
+            <Col>
               <Image
                 width={300}
                 height={79}
@@ -44,13 +56,44 @@ export default function Layout({ children }: { children: ReactElement }) {
                 objectFit="cover"
               />
             </Col>
-            <Col span={3}>
-              <Text h6 size={15} color="white" css={{ m: 0 }}>
-                Public DID: {did}
-              </Text>
-              <Text h6 size={15} color="white" css={{ m: 0 }}>
-                Credential Definition ID: <Link href="#">Register</Link>
-              </Text>
+            <Col>
+              <Row>
+                <Text h6 size={15} color="white" css={{ m: 0 }}>
+                  Public DID: {didQuery.data.did}
+                </Text>
+              </Row>
+              <Row align="center">
+                <Text h6 size={15} color="white" css={{ m: 0 }}>
+                  Credential Definition ID:
+                </Text>
+                &nbsp;
+                {schemasQuery.data.credentialDefinitionId ? (
+                  <Text h6 size={15} color="white" css={{ m: 0 }}>
+                    {schemasQuery.data.credentialDefinitionId}
+                  </Text>
+                ) : (
+                  <Button
+                    size="xs"
+                    disabled={
+                      registerDefinitionQuery.fetchStatus === 'fetching'
+                    }
+                    onPress={async () => {
+                      await registerDefinitionQuery.refetch()
+                      queryClient.invalidateQueries('schemas')
+                    }}
+                  >
+                    {registerDefinitionQuery.fetchStatus === 'fetching' ? (
+                      <Loading
+                        type="points-opacity"
+                        color="currentColor"
+                        size="sm"
+                      />
+                    ) : (
+                      'Register'
+                    )}
+                  </Button>
+                )}
+              </Row>
             </Col>
           </Row>
         </Card.Body>

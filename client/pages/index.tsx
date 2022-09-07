@@ -13,7 +13,7 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { QRCodeSVG } from 'qrcode.react'
 import { cloudAgentUrl } from '../constants'
-import { fromBase64Url, toBase64Url } from '../utils'
+import { fromBase64Url, get, toBase64Url } from '../utils'
 
 interface ConnectionModel {
   id: string
@@ -30,31 +30,23 @@ interface InvitationModel {
   outOfBandInvitation: Record<string, unknown>
 }
 
-const fetchInvitations = async () => {
-  const response = await fetch(`${cloudAgentUrl}/oobs`)
-  if (!response.ok) {
-    throw new Error('Network response was not ok')
-  }
-  return response.json()
-}
-
-const fetchConnections = async () => {
-  const response = await fetch(`${cloudAgentUrl}/connections`)
-  if (!response.ok) {
-    throw new Error('Network response was not ok')
-  }
-  return response.json()
-}
-
 const Connections: NextPage = () => {
-  const connectionsQuery = useQuery(['connections'], fetchConnections, {
-    placeholderData: [],
-    refetchInterval: 2000,
-  })
-  const invitationsQuery = useQuery(['invitations'], fetchInvitations, {
-    placeholderData: [],
-    refetchInterval: 2000,
-  })
+  const connectionsQuery = useQuery(
+    ['connections'],
+    () => get(`${cloudAgentUrl}/connections`),
+    {
+      placeholderData: [],
+      refetchInterval: 2000,
+    }
+  )
+  const invitationsQuery = useQuery(
+    ['invitations'],
+    () => get(`${cloudAgentUrl}/oobs`),
+    {
+      placeholderData: [],
+      refetchInterval: 2000,
+    }
+  )
   const [invitationUrl, setInvitationUrl] = useState('')
 
   const getInvitation = async () => {
