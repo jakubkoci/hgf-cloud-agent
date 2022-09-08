@@ -10,11 +10,10 @@ import {
   ProofPredicateInfo,
   V1CredentialPreview,
 } from '@aries-framework/core'
-import { agentDependencies, HttpInboundTransport } from '@aries-framework/node'
+import { HttpInboundTransport } from '@aries-framework/node'
 import morgan from 'morgan'
 import cors from 'cors'
 import { asyncHandler, errorHandler } from './middleware'
-import { IndyWallet } from '@aries-framework/core/build/wallet/IndyWallet'
 import { createSeed } from './util'
 
 async function startServer(
@@ -90,11 +89,15 @@ async function startServer(
       }
 
       const credentialPreview = V1CredentialPreview.fromRecord({
-        name: 'John',
-        age: '99',
+        Name: 'John',
+        Surname: 'Doe',
+        'Date of Birth': '19911911',
+        'Event Name': 'Hyperledger Global Forum',
+        'Event Year': '2022',
       })
       const credentialExchangeRecord = await agent.credentials.offerCredential({
-        comment: 'some comment about credential',
+        comment:
+          'This credentials allows the holder to enter the Hyperledger Global Forum conference.',
         connectionId,
         credentialFormats: {
           indy: {
@@ -119,8 +122,16 @@ async function startServer(
       }
 
       const attributes = {
-        name: new ProofAttributeInfo({
-          name: 'name',
+        Surname: new ProofAttributeInfo({
+          name: 'Surname',
+          restrictions: [
+            new AttributeFilter({
+              credentialDefinitionId,
+            }),
+          ],
+        }),
+        'Event Name': new ProofAttributeInfo({
+          name: 'Event Name',
           restrictions: [
             new AttributeFilter({
               credentialDefinitionId,
@@ -131,10 +142,20 @@ async function startServer(
 
       // Sample predicates
       const predicates = {
-        age: new ProofPredicateInfo({
-          name: 'age',
+        'Date of Birth': new ProofPredicateInfo({
+          name: 'Date of Birth',
+          predicateType: PredicateType.LessThanOrEqualTo,
+          predicateValue: 20000101,
+          restrictions: [
+            new AttributeFilter({
+              credentialDefinitionId,
+            }),
+          ],
+        }),
+        'Event Year': new ProofPredicateInfo({
+          name: 'Event Year',
           predicateType: PredicateType.GreaterThanOrEqualTo,
-          predicateValue: 50,
+          predicateValue: 2022,
           restrictions: [
             new AttributeFilter({
               credentialDefinitionId,
@@ -174,8 +195,14 @@ async function startServer(
     '/register-schema',
     asyncHandler(async (req, res) => {
       const template = {
-        attributes: ['name', 'age'],
-        name: `test-schema`,
+        attributes: [
+          'Name',
+          'Surname',
+          'Date of Birth',
+          'Event Name',
+          'Event Year',
+        ],
+        name: 'Conference Ticket',
         version: '1.0',
       }
       const schema = await agent.ledger.registerSchema(template)
