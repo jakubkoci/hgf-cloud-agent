@@ -5,13 +5,10 @@ import {
   InitConfig,
   LogLevel,
 } from '@aries-framework/core'
-import dotenv from 'dotenv-safe'
 import {
   pool_transactions_buildernet_genesis,
   pool_transactions_localhost_genesis,
 } from './txns'
-
-dotenv.config()
 
 const ledgers = {
   localhost: {

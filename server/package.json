@@ -11,7 +11,8 @@
     "test": "jest",
     "test:watch": "yarn test --watchAll",
     "start": "node ./build/src/main.js",
-    "start:watch": "nodemon ./src/main.ts"
+    "start:watch": "nodemon ./src/main.ts",
+    "start:ngrok": "yarn ts-node start-tunnel.ts"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
@@ -25,6 +26,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
     "jest": "^28.1.3",
+    "ngrok": "^4.3.3",
     "nodemon": "^2.0.19",
     "prettier": "^2.7.1",
     "ts-jest": "^28.0.7",
