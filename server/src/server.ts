@@ -10,10 +10,12 @@ import {
   ProofPredicateInfo,
   V1CredentialPreview,
 } from '@aries-framework/core'
-import { HttpInboundTransport } from '@aries-framework/node'
+import { agentDependencies, HttpInboundTransport } from '@aries-framework/node'
 import morgan from 'morgan'
 import cors from 'cors'
 import { asyncHandler, errorHandler } from './middleware'
+import { IndyWallet } from '@aries-framework/core/build/wallet/IndyWallet'
+import { createSeed } from './util'
 
 async function startServer(
   agent: Agent,
@@ -199,6 +201,14 @@ async function startServer(
       )
       credentialDefinitionId = definition.id
       res.status(200).json({ definition })
+    })
+  )
+
+  app.get(
+    '/create-did',
+    asyncHandler(async (_, res) => {
+      const didAndSeed = await createSeed(agent)
+      res.status(200).json(didAndSeed)
     })
   )
 
