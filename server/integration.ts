@@ -25,6 +25,8 @@ import {
 
 config()
 
+const autoRequestForCredential = false
+
 export const ledgers = {
   localhost: {
     id: `pool-localhost-integration`,
@@ -56,7 +58,7 @@ const agentConfig = {
   mediatorPickupStrategy: MediatorPickupStrategy.PickUpV1,
   logger: new ConsoleLogger(LogLevel.trace),
   connectToIndyLedgersOnStartup: false,
-  indyLedgers: [ledgers.bcovrin],
+  indyLedgers: [ledgers.buildernet],
   autoAcceptCredentials: AutoAcceptCredential.ContentApproved,
 }
 
@@ -97,13 +99,15 @@ async function run() {
     addCredentialHandler(agent)
     addProofHandler(agent)
 
-    const issueCredentialResponse = await fetch(
-      `${cloudAgentUrl}/issue-credential/${connection.id}`
-    )
-    if (!issueCredentialResponse.ok) {
-      throw new Error(
-        `HTTP response ${issueCredentialResponse.status} ${issueCredentialResponse.statusText}`
+    if (autoRequestForCredential) {
+      const issueCredentialResponse = await fetch(
+        `${cloudAgentUrl}/issue-credential/${connection.id}`
       )
+      if (!issueCredentialResponse.ok) {
+        throw new Error(
+          `HTTP response ${issueCredentialResponse.status} ${issueCredentialResponse.statusText}`
+        )
+      }
     }
   } catch (error) {
     console.error(error)

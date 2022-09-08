@@ -42,7 +42,4 @@ COPY package.json package.json
 
 RUN yarn install
 
-COPY patches patches
-RUN npx patch-package
-
 CMD ["yarn", "start:watch"]
