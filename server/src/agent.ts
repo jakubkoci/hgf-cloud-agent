@@ -6,6 +6,7 @@ import {
   LogLevel,
 } from '@aries-framework/core'
 import {
+  pool_transactions_bcovrin_genesis,
   pool_transactions_buildernet_genesis,
   pool_transactions_localhost_genesis,
 } from './txns'
@@ -29,6 +30,11 @@ const ledgers = {
       acceptanceMechanism: 'service_agreement',
     },
   },
+  bcovrin: {
+    id: `pool-bcovrin-cloud-agent`,
+    isProduction: false,
+    genesisTransactions: pool_transactions_bcovrin_genesis,
+  },
 } as const
 
 function createAgent(): Agent {
@@ -44,7 +50,7 @@ function createAgent(): Agent {
     autoAcceptConnections: true,
     autoAcceptMediationRequests: true,
     logger: new ConsoleLogger(LogLevel.debug),
-    indyLedgers: [ledgers.buildernet],
+    indyLedgers: [ledgers.bcovrin],
   }
   return new Agent(agentConfig, agentDependencies)
 }

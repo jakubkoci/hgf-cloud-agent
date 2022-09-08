@@ -18,6 +18,7 @@ import {
 import { agentDependencies } from '@aries-framework/node'
 import fetch from 'node-fetch-commonjs'
 import {
+  pool_transactions_bcovrin_genesis,
   pool_transactions_buildernet_genesis,
   pool_transactions_localhost_genesis,
 } from './src/txns'
@@ -35,6 +36,11 @@ export const ledgers = {
     isProduction: false,
     genesisTransactions: pool_transactions_buildernet_genesis,
   },
+  bcovrin: {
+    id: `pool-bcovrin-cloud-agent`,
+    isProduction: false,
+    genesisTransactions: pool_transactions_bcovrin_genesis,
+  },
 }
 
 const cloudAgentUrl = process.env.AGENT_ENDPOINTS
@@ -50,7 +56,7 @@ const agentConfig = {
   mediatorPickupStrategy: MediatorPickupStrategy.PickUpV1,
   logger: new ConsoleLogger(LogLevel.trace),
   connectToIndyLedgersOnStartup: false,
-  indyLedgers: [ledgers.buildernet],
+  indyLedgers: [ledgers.bcovrin],
   autoAcceptCredentials: AutoAcceptCredential.ContentApproved,
 }
 
@@ -101,10 +107,6 @@ async function run() {
     }
   } catch (error) {
     console.error(error)
-    if (agent.isInitialized) {
-      agent.shutdown()
-    }
-    process.exit(1)
   }
 }
 
@@ -148,14 +150,6 @@ function addCredentialHandler(agent: Agent) {
       }
       if (credentialRecord.state === CredentialState.CredentialReceived) {
         console.log('credentialRecord received', credentialRecord)
-        // const requestProofResponse = await fetch(
-        //   `${cloudAgentUrl}/request-proof/${connection.id}`
-        // )
-        // if (!requestProofResponse.ok) {
-        //   throw new Error(
-        //     `HTTP response ${requestProofResponse.status} ${requestProofResponse.statusText}`
-        //   )
-        // }
       }
     }
   )

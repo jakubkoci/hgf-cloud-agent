@@ -20,8 +20,9 @@ export function fromBase64Url(url: string) {
 
 export async function get(endpoint: string) {
   const response = await fetch(endpoint)
+  const json = await response.json()
   if (!response.ok) {
-    throw new Error('Network response was not ok')
+    throw new Error(JSON.stringify(json, null, 2))
   }
-  return response.json()
+  return json
 }
