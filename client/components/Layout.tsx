@@ -79,7 +79,7 @@ export default function Layout({ children }: { children: ReactElement }) {
                     }
                     onPress={async () => {
                       await registerDefinitionQuery.refetch()
-                      queryClient.invalidateQueries('schemas')
+                      queryClient.invalidateQueries(['schemas'])
                     }}
                   >
                     {registerDefinitionQuery.fetchStatus === 'fetching' ? (
