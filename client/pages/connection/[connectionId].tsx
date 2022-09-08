@@ -11,7 +11,6 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
 import { cloudAgentUrl } from '../../constants'
 import { get } from '../../utils'
 
@@ -31,28 +30,26 @@ interface CredentialModel {
 }
 
 const ConnectionDetail: NextPage = () => {
-  const [connection, setConnection] = useState({ id: '' })
-  const [isLoading, setLoading] = useState(false)
   const router = useRouter()
   const { connectionId } = router.query
-  console.log(router, connectionId)
 
-  useEffect(() => {
-    setLoading(true)
-    fetch('http://localhost:3001/connections')
-      .then((res) => res.json())
-      .then((connections) => {
-        console.log(connections)
-        const connection = connections.find((connection: ConnectionModel) => {
-          console.log('connection', connection)
-          return connection.id === connectionId
-        })
-        if (connection) {
-          setConnection(connection)
-        }
-        setLoading(false)
-      })
-  }, [connectionId])
+  const connectionQuery = useQuery(
+    ['connections', connectionId],
+    async () => {
+      const connections = await get(`${cloudAgentUrl}/connections`)
+      const connection = connections.find(
+        (connection: ConnectionModel) => connection.id === connectionId
+      )
+      if (connection) {
+        return connection
+      }
+
+      return {}
+    },
+    { placeholderData: { id: '' } }
+  )
+
+  const connection = connectionQuery.data
 
   return (
     <>
