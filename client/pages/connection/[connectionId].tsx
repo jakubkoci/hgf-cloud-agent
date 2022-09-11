@@ -1,14 +1,14 @@
 import {
-    Button,
-    Card,
-    Container,
-    Link,
-    Modal,
-    Row,
-    Spacer,
-    Table,
-    Text,
-    Grid
+  Button,
+  Card,
+  Container,
+  Link,
+  Modal,
+  Row,
+  Spacer,
+  Table,
+  Text,
+  Grid,
 } from '@nextui-org/react'
 import { useQuery } from '@tanstack/react-query'
 import type { NextPage } from 'next'
@@ -34,7 +34,7 @@ interface CredentialModel {
 }
 
 interface ProofRequestModel extends CredentialModel {
-  presentationMessage:  any
+  presentationMessage: any
 }
 
 interface DetailsItemModel {
@@ -111,10 +111,11 @@ function CredentialList({ connectionId }: { connectionId: string }) {
     <>
       <DetailsModal
         visible={!!details}
-        title='Credential Details'
+        title="Credential Details"
         onClose={closeModal}
       >
-        { details && <ConnectionDetailsChunk details={details} /> }
+        {/* @ts-ignore */}
+        {details && <CredentialDetailsChunk details={details} />}
       </DetailsModal>
       <Row justify="space-between" align="center">
         <Text h2>Credentials</Text>
@@ -149,11 +150,9 @@ function CredentialList({ connectionId }: { connectionId: string }) {
                 <Table.Cell>{credential.state}</Table.Cell>
                 <Table.Cell>
                   <Link href="#">
-                    <Button
-                      onPress={() =>
-                        setDetails(credential)
-                      }
-                    >Detail</Button>
+                    <Button onPress={() => setDetails(credential)}>
+                      Detail
+                    </Button>
                   </Link>
                 </Table.Cell>
               </Table.Row>
@@ -189,10 +188,11 @@ function ProofList({ connectionId }: { connectionId: string }) {
     <>
       <DetailsModal
         visible={!!details}
-        title='Proof Request Details'
+        title="Proof Request Details"
         onClose={closeModal}
       >
-        { details && <ProofRequestDetailsChunk details={details} /> }
+        {/* @ts-ignore */}
+        {details && <ProofRequestDetailsChunk details={details} />}
       </DetailsModal>
       <Row justify="space-between" align="center">
         <Text h2>Proofs</Text>
@@ -225,11 +225,7 @@ function ProofList({ connectionId }: { connectionId: string }) {
                 <Table.Cell>{proof.state}</Table.Cell>
                 <Table.Cell>
                   <Link href="#">
-                    <Button
-                      onPress={() =>
-                        setDetails(proof)
-                      }
-                    >Detail</Button>
+                    <Button onPress={() => setDetails(proof)}>Detail</Button>
                   </Link>
                 </Table.Cell>
               </Table.Row>
@@ -241,13 +237,17 @@ function ProofList({ connectionId }: { connectionId: string }) {
   )
 }
 
-function DetailsModal({children, visible, title, onClose,}: {
-      children: ReactElement
-      visible: boolean
-      title: string
-      onClose: () => void
-  })
-{
+function DetailsModal({
+  children,
+  visible,
+  title,
+  onClose,
+}: {
+  children: ReactElement
+  visible: boolean
+  title: string
+  onClose: () => void
+}) {
   return (
     <Modal
       width="650px"
@@ -259,42 +259,45 @@ function DetailsModal({children, visible, title, onClose,}: {
       onClose={onClose}
     >
       <Modal.Header>
-          <Text h2 id="modal-title">{title}</Text>
+        <Text h2 id="modal-title">
+          {title}
+        </Text>
       </Modal.Header>
-      <Modal.Body>
-        { children }
-      </Modal.Body>
+      <Modal.Body>{children}</Modal.Body>
       <Modal.Footer>
-          <Button auto flat color="error" onClick={onClose}>
-              Close
-          </Button>
+        <Button auto flat color="error" onClick={onClose}>
+          Close
+        </Button>
       </Modal.Footer>
     </Modal>
   )
 }
 
-function ConnectionDetailsChunk({ details }: {
-  details: CredentialModel
-}) {
-  return (
-    <TitledDetails data={details.credentialAttributes} />
-  )
+function CredentialDetailsChunk({ details }: { details: CredentialModel }) {
+  return <TitledDetails data={details.credentialAttributes} />
 }
 
-function ProofRequestDetailsChunk({ details }: {
-  details: ProofRequestModel
-}) {
-  const [presentationMessage] = useState(JSON.parse(
-    new Buffer(
-      details.presentationMessage['presentations~attach'][0].data.base64,
-      'base64'
-    ).toString('ascii')
-  ))
-  const [revealedAttrs] = useState<any>(presentationMessage.requested_proof.revealed_attrs)
-  const [revealedAttrsDataMap] = useState<DetailsItemModel[]>(getProofAttrs(revealedAttrs))
-  const [predicates] = useState<any>(presentationMessage.requested_proof.predicates)
-  const [predicatesDataMap] = useState<DetailsItemModel[]>(getProofAttrs(predicates))
-
+function ProofRequestDetailsChunk({ details }: { details: ProofRequestModel }) {
+  const [presentationMessage] = useState(
+    JSON.parse(
+      new Buffer(
+        details.presentationMessage['presentations~attach'][0].data.base64,
+        'base64'
+      ).toString('ascii')
+    )
+  )
+  const [revealedAttrs] = useState<any>(
+    presentationMessage.requested_proof.revealed_attrs
+  )
+  const [revealedAttrsDataMap] = useState<DetailsItemModel[]>(
+    getProofAttrs(revealedAttrs)
+  )
+  const [predicates] = useState<any>(
+    presentationMessage.requested_proof.predicates
+  )
+  const [predicatesDataMap] = useState<DetailsItemModel[]>(
+    getProofAttrs(predicates)
+  )
 
   function getProofAttrs(data: any): DetailsItemModel[] {
     let tempRevealedAttrs = []
@@ -302,7 +305,7 @@ function ProofRequestDetailsChunk({ details }: {
     for (let proofName in data) {
       tempRevealedAttrs.push({
         name: proofName,
-        value: data[proofName].raw
+        value: data[proofName].raw,
       })
     }
 
@@ -312,46 +315,51 @@ function ProofRequestDetailsChunk({ details }: {
   return (
     <>
       <Grid.Container>
-        <TitledDetails data={revealedAttrsDataMap} title='Revealed Attributes' />
-        <TitledDetails data={predicatesDataMap} title='Predicates' />
+        <TitledDetails
+          data={revealedAttrsDataMap}
+          title="Revealed Attributes"
+        />
+        <TitledDetails data={predicatesDataMap} title="Predicates" />
       </Grid.Container>
     </>
   )
 }
 
-function TitledDetails({ data, title }: {
+function TitledDetails({
+  data,
+  title,
+}: {
   data: DetailsItemModel[]
   title?: string
 }) {
   return (
     <>
-      {
-        data.length && title && <Grid xs={12} css={{alignItems: 'center', margin: '15px 0'}}>
+      {data.length && title && (
+        <Grid xs={12} css={{ alignItems: 'center', margin: '15px 0' }}>
           <Text h4>{title}</Text>
         </Grid>
-      }
-      {
-        data.length && data.map((proof: DetailsItemModel, index: number) => {
-          return <Grid.Container
-            key={index}
-            css={{
-              width: '100%',
-              pl: '$6',
-              background: index%2 == 0 ? '#f9f9f9' : '#fff',
-              height: '$15',
-            }}
-          >
-            <Grid xs={6} css={{alignItems: 'center'}}>
-              <Text>
-                {proof.name}
-              </Text>
-            </Grid>
-            <Grid xs={6} css={{alignItems: 'center'}}>
-              <Text>{proof.value}</Text>
-            </Grid>
-          </Grid.Container>
-        })
-      }
+      )}
+      {data.length &&
+        data.map((proof: DetailsItemModel, index: number) => {
+          return (
+            <Grid.Container
+              key={index}
+              css={{
+                width: '100%',
+                pl: '$6',
+                background: index % 2 == 0 ? '#f9f9f9' : '#fff',
+                height: '$15',
+              }}
+            >
+              <Grid xs={6} css={{ alignItems: 'center' }}>
+                <Text>{proof.name}</Text>
+              </Grid>
+              <Grid xs={6} css={{ alignItems: 'center' }}>
+                <Text>{proof.value}</Text>
+              </Grid>
+            </Grid.Container>
+          )
+        })}
     </>
   )
 }

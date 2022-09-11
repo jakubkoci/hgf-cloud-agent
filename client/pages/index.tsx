@@ -196,7 +196,7 @@ function InvitationModal({
           QR Code
         </Text>
         <Row justify="center">
-          {invitationUrl && <QRCodeSVG size={400} value={invitationUrl} />}
+          {invitationUrl && <QRCodeSVG size={300} value={invitationUrl} />}
         </Row>
         <Text h3 id="modal-title">
           URL
