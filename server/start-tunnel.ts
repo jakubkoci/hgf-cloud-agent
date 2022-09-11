@@ -3,6 +3,11 @@ import dotenv from 'dotenv-safe'
 
 dotenv.config()
 
-ngrok.connect(Number(process.env.PORT) || 3001).then((url) => {
-  console.log(url)
-})
+ngrok
+  .connect({
+    addr: Number(process.env.PORT) || 3001,
+    authtoken: process.env.NGROK_AUTH_TOKEN,
+  })
+  .then((url) => {
+    console.log(url)
+  })
