@@ -10,10 +10,10 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@aries-framework/core@0.2.3", "@aries-framework/core@^0.2.2":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@aries-framework/core/-/core-0.2.3.tgz#c7bfef6ed82c4bf462e1f02e11e0c3144e345a1d"
-  integrity sha512-0HtxidljOFhBMdXCx0p/rkO285d8tMreJYBHlNyVXYnPNAYw/OBDqfSxloMYf13kJfq/3AL0XZkoQOepuLZdrw==
+"@aries-framework/core@0.2.4-alpha.3", "@aries-framework/core@0.2.4-alpha.3+4ca56f6":
+  version "0.2.4-alpha.3"
+  resolved "https://registry.yarnpkg.com/@aries-framework/core/-/core-0.2.4-alpha.3.tgz#5de7ada924a5eb911294614c4a78882414b0bf70"
+  integrity sha512-5xYjBr5pHI22Z1eypn2D/KM8kH2eADFZCkvbhJpYvniTDVWDWgiWMwsVGdPrX3XbIzZNTABLQwce6o2hTfqKIg==
   dependencies:
     "@multiformats/base-x" "^4.0.1"
     "@stablelib/ed25519" "^1.0.2"
@@ -40,12 +40,12 @@
     varint "^6.0.0"
     web-did-resolver "^2.0.8"
 
-"@aries-framework/node@^0.2.2":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@aries-framework/node/-/node-0.2.3.tgz#9ad0d1b2ed52bb5ae3139e8911af9e3f7b8667f3"
-  integrity sha512-l1AZi/jAM/THyTPn3HlddYo+aj4uiIuxrzR0Vx3dBPA3dqmuzkCEOOjR4HlqheTMaxY+pkxZ1v865nwcBPo44A==
+"@aries-framework/node@0.2.4-alpha.3":
+  version "0.2.4-alpha.3"
+  resolved "https://registry.yarnpkg.com/@aries-framework/node/-/node-0.2.4-alpha.3.tgz#e177f76c93f7a8f5756108b143567c890f557d37"
+  integrity sha512-HEfFQh32pbJ7fxLoDAl8vuju1RljiXDs8pAT79Y/FPg55DU7fFv3DoKgfORhTnmjSEZQahExpmL66x9k4ioCuA==
   dependencies:
-    "@aries-framework/core" "0.2.3"
+    "@aries-framework/core" "0.2.4-alpha.3+4ca56f6"
     express "^4.17.1"
     ffi-napi "^4.0.3"
     indy-sdk "^1.16.0-dev-1636"
