@@ -1,18 +1,21 @@
 import {
-  Button,
-  Card,
-  Container,
-  Link,
-  Row,
-  Spacer,
-  Table,
-  Text,
+    Button,
+    Card,
+    Container,
+    Link,
+    Modal,
+    Row,
+    Spacer,
+    Table,
+    Text,
+    Grid
 } from '@nextui-org/react'
 import { useQuery } from '@tanstack/react-query'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { cloudAgentUrl } from '../../constants'
 import { get } from '../../utils'
+import { ReactElement, useState } from 'react'
 
 interface ConnectionModel {
   id: string
@@ -27,6 +30,16 @@ interface CredentialModel {
   createdAt: string
   state: string
   connectionId: string
+  credentialAttributes: any
+}
+
+interface ProofRequestModel extends CredentialModel {
+  presentationMessage:  any
+}
+
+interface DetailsItemModel {
+  name: string
+  value: string
 }
 
 const ConnectionDetail: NextPage = () => {
@@ -88,9 +101,21 @@ function CredentialList({ connectionId }: { connectionId: string }) {
       refetchInterval: 2000,
     }
   )
+  const [details, setDetails] = useState<CredentialModel | null>(null)
+
+  const closeModal = (): void => {
+    setDetails(null)
+  }
 
   return (
     <>
+      <DetailsModal
+        visible={!!details}
+        title='Credential Details'
+        onClose={closeModal}
+      >
+        { details && <ConnectionDetailsChunk details={details} /> }
+      </DetailsModal>
       <Row justify="space-between" align="center">
         <Text h2>Credentials</Text>
         <Button
@@ -124,7 +149,11 @@ function CredentialList({ connectionId }: { connectionId: string }) {
                 <Table.Cell>{credential.state}</Table.Cell>
                 <Table.Cell>
                   <Link href="#">
-                    <Button>Detail</Button>
+                    <Button
+                      onPress={() =>
+                        setDetails(credential)
+                      }
+                    >Detail</Button>
                   </Link>
                 </Table.Cell>
               </Table.Row>
@@ -142,7 +171,7 @@ function ProofList({ connectionId }: { connectionId: string }) {
     async () => {
       const proofs = await get(`${cloudAgentUrl}/proofs`)
       return proofs.filter(
-        (proof: CredentialModel) => proof.connectionId === connectionId
+        (proof: ProofRequestModel) => proof.connectionId === connectionId
       )
     },
     {
@@ -150,9 +179,21 @@ function ProofList({ connectionId }: { connectionId: string }) {
       refetchInterval: 2000,
     }
   )
+  const [details, setDetails] = useState<ProofRequestModel | null>(null)
+
+  const closeModal = (): void => {
+    setDetails(null)
+  }
 
   return (
     <>
+      <DetailsModal
+        visible={!!details}
+        title='Proof Request Details'
+        onClose={closeModal}
+      >
+        { details && <ProofRequestDetailsChunk details={details} /> }
+      </DetailsModal>
       <Row justify="space-between" align="center">
         <Text h2>Proofs</Text>
         <Button
@@ -176,15 +217,19 @@ function ProofList({ connectionId }: { connectionId: string }) {
           <Table.Column>Actions</Table.Column>
         </Table.Header>
         <Table.Body>
-          {proofsQuery.data.map((proof: CredentialModel) => {
+          {proofsQuery.data.map((proof: ProofRequestModel) => {
             return (
-              <Table.Row key="1">
+              <Table.Row key={proof.id}>
                 <Table.Cell>{proof.id}</Table.Cell>
                 <Table.Cell>{proof.createdAt}</Table.Cell>
                 <Table.Cell>{proof.state}</Table.Cell>
                 <Table.Cell>
                   <Link href="#">
-                    <Button>Detail</Button>
+                    <Button
+                      onPress={() =>
+                        setDetails(proof)
+                      }
+                    >Detail</Button>
                   </Link>
                 </Table.Cell>
               </Table.Row>
@@ -192,6 +237,121 @@ function ProofList({ connectionId }: { connectionId: string }) {
           })}
         </Table.Body>
       </Table>
+    </>
+  )
+}
+
+function DetailsModal({children, visible, title, onClose,}: {
+      children: ReactElement
+      visible: boolean
+      title: string
+      onClose: () => void
+  })
+{
+  return (
+    <Modal
+      width="650px"
+      closeButton
+      scroll
+      preventClose
+      aria-labelledby="modal-title"
+      open={visible}
+      onClose={onClose}
+    >
+      <Modal.Header>
+          <Text h2 id="modal-title">{title}</Text>
+      </Modal.Header>
+      <Modal.Body>
+        { children }
+      </Modal.Body>
+      <Modal.Footer>
+          <Button auto flat color="error" onClick={onClose}>
+              Close
+          </Button>
+      </Modal.Footer>
+    </Modal>
+  )
+}
+
+function ConnectionDetailsChunk({ details }: {
+  details: CredentialModel
+}) {
+  return (
+    <TitledDetails data={details.credentialAttributes} />
+  )
+}
+
+function ProofRequestDetailsChunk({ details }: {
+  details: ProofRequestModel
+}) {
+  const [presentationMessage] = useState(JSON.parse(
+    new Buffer(
+      details.presentationMessage['presentations~attach'][0].data.base64,
+      'base64'
+    ).toString('ascii')
+  ))
+  const [revealedAttrs] = useState<any>(presentationMessage.requested_proof.revealed_attrs)
+  const [revealedAttrsDataMap] = useState<DetailsItemModel[]>(getProofAttrs(revealedAttrs))
+  const [predicates] = useState<any>(presentationMessage.requested_proof.predicates)
+  const [predicatesDataMap] = useState<DetailsItemModel[]>(getProofAttrs(predicates))
+
+
+  function getProofAttrs(data: any): DetailsItemModel[] {
+    let tempRevealedAttrs = []
+
+    for (let proofName in data) {
+      tempRevealedAttrs.push({
+        name: proofName,
+        value: data[proofName].raw
+      })
+    }
+
+    return tempRevealedAttrs
+  }
+
+  return (
+    <>
+      <Grid.Container>
+        <TitledDetails data={revealedAttrsDataMap} title='Revealed Attributes' />
+        <TitledDetails data={predicatesDataMap} title='Predicates' />
+      </Grid.Container>
+    </>
+  )
+}
+
+function TitledDetails({ data, title }: {
+  data: DetailsItemModel[]
+  title?: string
+}) {
+  return (
+    <>
+      {
+        data.length && title && <Grid xs={12} css={{alignItems: 'center', margin: '15px 0'}}>
+          <Text h4>{title}</Text>
+        </Grid>
+      }
+      {
+        data.length && data.map((proof: DetailsItemModel, index: number) => {
+          return <Grid.Container
+            key={index}
+            css={{
+              width: '100%',
+              pl: '$6',
+              background: index%2 == 0 ? '#f9f9f9' : '#fff',
+              height: '$15',
+            }}
+          >
+            <Grid xs={6} css={{alignItems: 'center'}}>
+              <Text>
+                {proof.name}
+              </Text>
+            </Grid>
+            <Grid xs={6} css={{alignItems: 'center'}}>
+              <Text>{proof.value}</Text>
+            </Grid>
+          </Grid.Container>
+        })
+      }
     </>
   )
 }
