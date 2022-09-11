@@ -13,6 +13,8 @@ import {
 import { HttpInboundTransport } from '@aries-framework/node'
 import morgan from 'morgan'
 import cors from 'cors'
+import schemas from '../schemas.json'
+import fs from 'fs'
 import { asyncHandler, errorHandler } from './middleware'
 import { createSeed } from './util'
 
@@ -25,8 +27,8 @@ async function startServer(
   app.use(cors())
   app.set('json spaces', 2)
 
-  let schemaId = process.env.SCHEMA_ID
-  let credentialDefinitionId = ''
+  let schemaId = schemas.schemaId
+  let credentialDefinitionId = schemas.credentialDefinitionId
 
   app.get(
     '/',
@@ -207,6 +209,7 @@ async function startServer(
       }
       const schema = await agent.ledger.registerSchema(template)
       schemaId = schema.id
+      saveToFile({ schemaId })
       res.status(200).json({ schema })
     })
   )
@@ -227,6 +230,7 @@ async function startServer(
         definitionTemplate
       )
       credentialDefinitionId = definition.id
+      saveToFile({ credentialDefinitionId })
       res.status(200).json({ definition })
     })
   )
@@ -250,6 +254,14 @@ async function startServer(
 async function stopServer(agent: Agent): Promise<void> {
   await agent.shutdown()
   await agent.wallet.delete()
+}
+
+function saveToFile(newSchemas: {
+  schemaId?: string
+  credentialDefinitionId?: string
+}) {
+  const updatedSchemas = { ...schemas, ...newSchemas }
+  fs.writeFileSync('schemas.json', JSON.stringify(updatedSchemas, null, 2))
 }
 
 export { startServer, stopServer }
