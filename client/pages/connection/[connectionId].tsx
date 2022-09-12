@@ -68,7 +68,7 @@ const ConnectionDetail: NextPage = () => {
     <>
       <Container>
         <Row justify="space-between" align="center">
-          <Text h1>Connection Detail</Text>
+          <Text h1>Connection Details</Text>
         </Row>
         <Spacer y={1} />
 
