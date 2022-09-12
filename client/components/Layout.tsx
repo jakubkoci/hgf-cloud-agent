@@ -3,17 +3,20 @@ import {
   Card,
   Col,
   Container,
+  Grid,
   Image,
   Loading,
   Row,
   Spacer,
   Text,
+  Link,
 } from '@nextui-org/react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import Head from 'next/head'
 import { ReactElement } from 'react'
 import { cloudAgentUrl } from '../constants'
 import { get } from '../utils'
+import { useRouter } from 'next/router'
 
 export default function Layout({ children }: { children: ReactElement }) {
   const queryClient = useQueryClient()
@@ -46,60 +49,112 @@ export default function Layout({ children }: { children: ReactElement }) {
       </Head>
       <Card css={{ $$cardColor: '$colors$gradient' }}>
         <Card.Body>
-          <Row justify="space-between" align="center">
-            <Col>
-              <Image
-                width={300}
-                height={79}
-                src="/HL_GlobalForum_2022_PromoGraphics_Logo-White.svg"
-                alt="Default Image"
-                objectFit="cover"
-              />
-            </Col>
-            <Col>
-              <Row>
-                <Text h6 size={15} color="white" css={{ m: 0 }}>
-                  Public DID: {didQuery.data.did}
-                </Text>
-              </Row>
-              <Row align="center">
-                <Text h6 size={15} color="white" css={{ m: 0 }}>
-                  Credential Definition ID:
-                </Text>
-                &nbsp;
-                {schemasQuery.data.credentialDefinitionId ? (
+          <Grid.Container>
+            <Grid md={6} css={{ paddingLeft: 20 }}>
+              <Link href='/'>
+                <Image
+                  width={300}
+                  height={79}
+                  src="/HL_GlobalForum_2022_PromoGraphics_Logo-White.svg"
+                  alt="Default Image"
+                  objectFit="cover"
+                />
+              </Link>
+            </Grid>
+            <Grid md={6} css={{ display: 'flex' }}>
+              <Grid.Container
+                css={{
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                }}
+              >
+                <Grid>
                   <Text h6 size={15} color="white" css={{ m: 0 }}>
-                    {schemasQuery.data.credentialDefinitionId}
+                    Public DID: {didQuery.data.did}
                   </Text>
-                ) : (
-                  <Button
-                    size="xs"
-                    disabled={
-                      registerDefinitionQuery.fetchStatus === 'fetching'
-                    }
-                    onPress={async () => {
-                      await registerDefinitionQuery.refetch()
-                      queryClient.invalidateQueries(['schemas'])
-                    }}
-                  >
-                    {registerDefinitionQuery.fetchStatus === 'fetching' ? (
-                      <Loading
-                        type="points-opacity"
-                        color="currentColor"
-                        size="sm"
-                      />
-                    ) : (
-                      'Register'
-                    )}
-                  </Button>
-                )}
-              </Row>
-            </Col>
-          </Row>
+                </Grid>
+                <Grid
+                  css={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                  }}
+                >
+                  <Text h6 size={15} color="white" css={{ m: 0, width: 'auto' }}>
+                    Credential Definition ID:
+                  </Text>
+                  &nbsp;
+                  {schemasQuery.data.credentialDefinitionId ? (
+                    <Text h6 size={15} color="white" css={{ m: 0 }}>
+                      {schemasQuery.data.credentialDefinitionId}
+                    </Text>
+                  ) : (
+                    <Button
+                      size="xs"
+                      disabled={
+                        registerDefinitionQuery.fetchStatus === 'fetching'
+                      }
+                      onPress={async () => {
+                        await registerDefinitionQuery.refetch()
+                        queryClient.invalidateQueries(['schemas'])
+                      }}
+                    >
+                      {registerDefinitionQuery.fetchStatus === 'fetching' ? (
+                        <Loading
+                          type="points-opacity"
+                          color="currentColor"
+                          size="sm"
+                        />
+                      ) : (
+                        'Register'
+                      )}
+                    </Button>
+                  )}
+                </Grid>
+              </Grid.Container>
+            </Grid>
+          </Grid.Container>
         </Card.Body>
       </Card>
       <Spacer y={1} />
+      <GoHomeSection />
+      <Spacer y={1} />
       {children}
     </Container>
+  )
+}
+
+function GoHomeSection() {
+  const { asPath } = useRouter()
+
+  return (
+    <>
+      { asPath !== '/' &&
+        <Card>
+          <Card.Body
+            css={{
+              display: 'flex',
+              flexDirection: 'row',
+            }}
+          >
+            <Link href='/'>
+              <Button
+                css={{
+                  width: 100,
+                  marginRight: 30,
+                }}
+              >
+                Home
+              </Button>
+            </Link>
+            <Text
+              css={{
+                lineHeight: '40px',
+                letterSpacing: '.8px',
+              }}
+            >{asPath}</Text>
+          </Card.Body>
+        </Card>
+      }
+    </>
   )
 }
