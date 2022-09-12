@@ -18,8 +18,10 @@ import {
 import { agentDependencies } from '@aries-framework/node'
 import fetch from 'node-fetch-commonjs'
 import {
+  pool_transactions_bcovrin_greenlight_genesis,
   pool_transactions_bcovrin_test_genesis,
   pool_transactions_buildernet_genesis,
+  pool_transactions_indicio_testnet_genesis,
   pool_transactions_localhost_genesis,
 } from './src/txns'
 
@@ -39,9 +41,19 @@ export const ledgers = {
     genesisTransactions: pool_transactions_buildernet_genesis,
   },
   bcovrin_test: {
-    id: `pool-bcovrin-integration`,
+    id: `pool-bcovrin-test-integration`,
     isProduction: false,
     genesisTransactions: pool_transactions_bcovrin_test_genesis,
+  },
+  bcovrin_greenlight: {
+    id: `pool-bcovrin-greenlight-integration`,
+    isProduction: false,
+    genesisTransactions: pool_transactions_bcovrin_greenlight_genesis,
+  },
+  indicio_testnet: {
+    id: `pool-indicio-testnet-integration`,
+    isProduction: false,
+    genesisTransactions: pool_transactions_indicio_testnet_genesis,
   },
 }
 
@@ -58,7 +70,7 @@ const agentConfig = {
   mediatorPickupStrategy: MediatorPickupStrategy.PickUpV1,
   logger: new ConsoleLogger(LogLevel.trace),
   connectToIndyLedgersOnStartup: false,
-  indyLedgers: [ledgers.buildernet],
+  indyLedgers: [ledgers.bcovrin_greenlight],
   autoAcceptCredentials: AutoAcceptCredential.ContentApproved,
 }
 

@@ -20,7 +20,7 @@ function createAgent(): Agent {
     autoAcceptConnections: true,
     autoAcceptMediationRequests: true,
     logger: new ConsoleLogger(LogLevel.debug),
-    indyLedgers: [ledgers.bcovrin_test],
+    indyLedgers: [ledgers.bcovrin_greenlight],
   }
   return new Agent(agentConfig, agentDependencies)
 }
