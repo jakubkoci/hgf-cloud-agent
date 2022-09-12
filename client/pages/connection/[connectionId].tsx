@@ -73,7 +73,34 @@ const ConnectionDetail: NextPage = () => {
         <Spacer y={1} />
 
         <Card>
-          <Card.Body>Details {connection.id}</Card.Body>
+          <Card.Body>
+          <Grid.Container css={{ pl: '$6' }}>
+            <Grid sm={12} md={6}>
+              <Text><strong>Connection ID:</strong> {connection.id}</Text>
+            </Grid>
+            <Grid sm={12} md={6}>
+              <Text><strong>Date:</strong> {connection.createdAt}</Text>
+            </Grid>
+            <Grid sm={12} md={6}>
+              <Text><strong>State:</strong> {connection.state}</Text>
+            </Grid>
+            <Grid sm={12} md={6}>
+              <Text><strong>Role:</strong> {connection.role}</Text>
+            </Grid>
+            <Grid sm={12} md={6}>
+              <Text><strong>Out Of Band ID:</strong> {connection.outOfBandId}</Text>
+            </Grid>
+            <Grid sm={12} md={6}>
+              <Text><strong>Auto Accept Connection:</strong> {connection.autoAcceptConnection ? 'true' : 'false'}</Text>
+            </Grid>
+            <Grid sm={12} md={6}>
+              <Text><strong>Our DID:</strong> {connection.did}</Text>
+            </Grid>
+            <Grid sm={12} md={6}>
+              <Text><strong>Their DID:</strong> {connection.theirDid}</Text>
+            </Grid>
+          </Grid.Container>
+          </Card.Body>
         </Card>
         <Spacer y={1} />
 
