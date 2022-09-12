@@ -30,22 +30,6 @@ async function startServer(
   let schemaId = schemas.schemaId
   let credentialDefinitionId = schemas.credentialDefinitionId
 
-  app.get(
-    '/',
-    asyncHandler(async (req, res) => {
-      res.send('Hello, World!')
-    })
-  )
-
-  app.get(
-    '/did',
-    asyncHandler(async (req, res) => {
-      const agentDid = agent.publicDid
-      console.log('request to /did', agentDid)
-      res.send(agentDid)
-    })
-  )
-
   // Create new invitation as inviter to invitee
   app.get(
     '/invitation',
@@ -53,30 +37,6 @@ async function startServer(
       const outOfBandRecord = await agent.oob.createInvitation()
       const { outOfBandInvitation } = outOfBandRecord
       res.send(outOfBandInvitation.toUrl({ domain: 'https://example.com/ssi' }))
-    })
-  )
-
-  app.get(
-    '/oobs',
-    asyncHandler(async (req, res) => {
-      const outOfBandRecords = await agent.oob.getAll()
-      res.status(200).json(outOfBandRecords)
-    })
-  )
-
-  app.get(
-    '/connections',
-    asyncHandler(async (req, res) => {
-      const connectionRecords = await agent.connections.getAll()
-      res.status(200).json(connectionRecords)
-    })
-  )
-
-  app.get(
-    '/credentials',
-    asyncHandler(async (req, res) => {
-      const credentialRecords = await agent.credentials.getAll()
-      res.status(200).json(credentialRecords)
     })
   )
 
@@ -176,20 +136,23 @@ async function startServer(
   )
 
   app.get(
-    '/proofs',
+    '/register-definition',
     asyncHandler(async (req, res) => {
-      const proofRecords = await agent.proofs.getAll()
-      res.status(200).json(proofRecords)
-    })
-  )
+      if (!schemaId) throw new Error('Schema ID is missing.')
+      const schema = await agent.ledger.getSchema(schemaId)
+      const definitionTemplate: CredentialDefinitionTemplate = {
+        schema,
+        signatureType: 'CL',
+        supportRevocation: false,
+        tag: 'default',
+      }
 
-  app.get(
-    '/schemas',
-    asyncHandler(async (req, res) => {
-      res.status(200).json({
-        schemaId,
-        credentialDefinitionId,
-      })
+      const definition = await agent.ledger.registerCredentialDefinition(
+        definitionTemplate
+      )
+      credentialDefinitionId = definition.id
+      saveToFile({ credentialDefinitionId })
+      res.status(200).json({ definition })
     })
   )
 
@@ -215,23 +178,60 @@ async function startServer(
   )
 
   app.get(
-    '/register-definition',
+    '/schemas',
     asyncHandler(async (req, res) => {
-      if (!schemaId) throw new Error('Schema ID is missing.')
-      const schema = await agent.ledger.getSchema(schemaId)
-      const definitionTemplate: CredentialDefinitionTemplate = {
-        schema,
-        signatureType: 'CL',
-        supportRevocation: false,
-        tag: 'default',
-      }
+      res.status(200).json({
+        schemaId,
+        credentialDefinitionId,
+      })
+    })
+  )
 
-      const definition = await agent.ledger.registerCredentialDefinition(
-        definitionTemplate
-      )
-      credentialDefinitionId = definition.id
-      saveToFile({ credentialDefinitionId })
-      res.status(200).json({ definition })
+  app.get(
+    '/',
+    asyncHandler(async (req, res) => {
+      res.send('Hello, World!')
+    })
+  )
+
+  app.get(
+    '/did',
+    asyncHandler(async (req, res) => {
+      const agentDid = agent.publicDid
+      console.log('request to /did', agentDid)
+      res.send(agentDid)
+    })
+  )
+
+  app.get(
+    '/oobs',
+    asyncHandler(async (req, res) => {
+      const outOfBandRecords = await agent.oob.getAll()
+      res.status(200).json(outOfBandRecords)
+    })
+  )
+
+  app.get(
+    '/connections',
+    asyncHandler(async (req, res) => {
+      const connectionRecords = await agent.connections.getAll()
+      res.status(200).json(connectionRecords)
+    })
+  )
+
+  app.get(
+    '/credentials',
+    asyncHandler(async (req, res) => {
+      const credentialRecords = await agent.credentials.getAll()
+      res.status(200).json(credentialRecords)
+    })
+  )
+
+  app.get(
+    '/proofs',
+    asyncHandler(async (req, res) => {
+      const proofRecords = await agent.proofs.getAll()
+      res.status(200).json(proofRecords)
     })
   )
 
@@ -251,11 +251,6 @@ async function startServer(
   await agent.initialize()
 }
 
-async function stopServer(agent: Agent): Promise<void> {
-  await agent.shutdown()
-  await agent.wallet.delete()
-}
-
 function saveToFile(newSchemas: {
   schemaId?: string
   credentialDefinitionId?: string
@@ -264,4 +259,4 @@ function saveToFile(newSchemas: {
   fs.writeFileSync('schemas.json', JSON.stringify(updatedSchemas, null, 2))
 }
 
-export { startServer, stopServer }
+export { startServer }
