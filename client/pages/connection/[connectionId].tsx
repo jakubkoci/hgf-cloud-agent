@@ -15,7 +15,7 @@ import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { cloudAgentUrl } from '../../constants'
 import { get, sortByDate } from '../../utils'
-import { ReactElement, useState } from 'react'
+import { ReactElement, useState, useEffect } from 'react'
 
 interface ConnectionModel {
   id: string
@@ -45,7 +45,7 @@ interface DetailsItemModel {
 const ConnectionDetail: NextPage = () => {
   const router = useRouter()
   const { connectionId } = router.query
-
+  const [connection, setConnection] = useState()
   const connectionQuery = useQuery(
     ['connections', connectionId],
     async () => {
@@ -59,56 +59,59 @@ const ConnectionDetail: NextPage = () => {
 
       return {}
     },
-    { placeholderData: { id: '' } }
   )
 
-  const connection = connectionQuery.data
+  useEffect(() => {
+    setConnection(connectionQuery.data)
+  }, [connectionQuery])
 
   return (
     <>
-      <Container>
-        <Row justify="space-between" align="center">
-          <Text h1>Connection Details</Text>
-        </Row>
-        <Spacer y={1} />
+      {
+        connection && <Container>
+          <Row justify="space-between" align="center">
+            <Text h1>Connection Details</Text>
+          </Row>
+          <Spacer y={1} />
 
-        <Card>
-          <Card.Body>
-          <Grid.Container css={{ pl: '$6' }}>
-            <Grid sm={12} md={6}>
-              <Text><strong>Connection ID:</strong> {connection.id}</Text>
-            </Grid>
-            <Grid sm={12} md={6}>
-              <Text><strong>Date:</strong> {connection.createdAt}</Text>
-            </Grid>
-            <Grid sm={12} md={6}>
-              <Text><strong>State:</strong> {connection.state}</Text>
-            </Grid>
-            <Grid sm={12} md={6}>
-              <Text><strong>Role:</strong> {connection.role}</Text>
-            </Grid>
-            <Grid sm={12} md={6}>
-              <Text><strong>Out Of Band ID:</strong> {connection.outOfBandId}</Text>
-            </Grid>
-            <Grid sm={12} md={6}>
-              <Text><strong>Auto Accept Connection:</strong> {connection.autoAcceptConnection ? 'true' : 'false'}</Text>
-            </Grid>
-            <Grid sm={12} md={6}>
-              <Text><strong>Our DID:</strong> {connection.did}</Text>
-            </Grid>
-            <Grid sm={12} md={6}>
-              <Text><strong>Their DID:</strong> {connection.theirDid}</Text>
-            </Grid>
-          </Grid.Container>
-          </Card.Body>
-        </Card>
-        <Spacer y={1} />
+          <Card>
+            <Card.Body>
+            <Grid.Container css={{ pl: '$6' }}>
+              <Grid sm={12} md={6}>
+                <Text><strong>Connection ID:</strong> {connection.id}</Text>
+              </Grid>
+              <Grid sm={12} md={6}>
+                <Text><strong>Date:</strong> {connection.createdAt}</Text>
+              </Grid>
+              <Grid sm={12} md={6}>
+                <Text><strong>State:</strong> {connection.state}</Text>
+              </Grid>
+              <Grid sm={12} md={6}>
+                <Text><strong>Role:</strong> {connection.role}</Text>
+              </Grid>
+              <Grid sm={12} md={6}>
+                <Text><strong>Out Of Band ID:</strong> {connection.outOfBandId}</Text>
+              </Grid>
+              <Grid sm={12} md={6}>
+                <Text><strong>Auto Accept Connection:</strong> {connection.autoAcceptConnection ? 'true' : 'false'}</Text>
+              </Grid>
+              <Grid sm={12} md={6}>
+                <Text><strong>Our DID:</strong> {connection.did}</Text>
+              </Grid>
+              <Grid sm={12} md={6}>
+                <Text><strong>Their DID:</strong> {connection.theirDid}</Text>
+              </Grid>
+            </Grid.Container>
+            </Card.Body>
+          </Card>
+          <Spacer y={1} />
 
-        <CredentialList connectionId={connection.id} />
-        <Spacer y={1} />
+          <CredentialList connectionId={connection.id} />
+          <Spacer y={1} />
 
-        <ProofList connectionId={connection.id} />
-      </Container>
+          <ProofList connectionId={connection.id} />
+        </Container>
+      }
     </>
   )
 }
@@ -125,7 +128,6 @@ function CredentialList({ connectionId }: { connectionId: string }) {
     },
     {
       placeholderData: [],
-      refetchInterval: 2000,
     }
   )
   const [details, setDetails] = useState<CredentialModel | null>(null)
@@ -202,7 +204,6 @@ function ProofList({ connectionId }: { connectionId: string }) {
     },
     {
       placeholderData: [],
-      refetchInterval: 2000,
     }
   )
   const [details, setDetails] = useState<ProofRequestModel | null>(null)
