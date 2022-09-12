@@ -18,7 +18,7 @@ import {
 import { agentDependencies } from '@aries-framework/node'
 import fetch from 'node-fetch-commonjs'
 import {
-  pool_transactions_bcovrin_genesis,
+  pool_transactions_bcovrin_test_genesis,
   pool_transactions_buildernet_genesis,
   pool_transactions_localhost_genesis,
 } from './src/txns'
@@ -38,10 +38,10 @@ export const ledgers = {
     isProduction: false,
     genesisTransactions: pool_transactions_buildernet_genesis,
   },
-  bcovrin: {
-    id: `pool-bcovrin-cloud-agent`,
+  bcovrin_test: {
+    id: `pool-bcovrin-integration`,
     isProduction: false,
-    genesisTransactions: pool_transactions_bcovrin_genesis,
+    genesisTransactions: pool_transactions_bcovrin_test_genesis,
   },
 }
 

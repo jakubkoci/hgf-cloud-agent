@@ -34,8 +34,8 @@ const Connections: NextPage = () => {
   const invitationsQuery = useQuery(
     ['invitations'],
     async () => {
-      const connections = await get(`${cloudAgentUrl}/oobs`)
-      return connections.sort(sortByDate)
+      const oobs = await get(`${cloudAgentUrl}/oobs`)
+      return oobs.sort(sortByDate)
     },
     {
       placeholderData: [],
@@ -44,7 +44,10 @@ const Connections: NextPage = () => {
   )
   const connectionsQuery = useQuery(
     ['connections'],
-    () => get(`${cloudAgentUrl}/connections`),
+    async () => {
+      const connections = await get(`${cloudAgentUrl}/connections`)
+      return connections.sort(sortByDate)
+    },
     {
       placeholderData: [],
       refetchInterval: 2000,
