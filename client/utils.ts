@@ -26,3 +26,10 @@ export async function get(endpoint: string) {
   }
   return json
 }
+
+export function sortByDate(a: any, b: any) {
+  function getDateStamp(dateString: 'string') {
+    return new Date(dateString).valueOf()
+  }
+  return getDateStamp(b.createdAt) - getDateStamp(a.createdAt)
+}
