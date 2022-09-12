@@ -364,7 +364,7 @@ function ProofRequestDetailsChunk({ details }: { details: ProofRequestModel }) {
     function getPredicateValue(proofName: string) {
       const predicatesData =
         presentationMessage.proof.proofs[0].primary_proof.ge_proofs.filter(
-          (item) => {
+          (item: any) => {
             return (
               item.predicate.attr_name ===
               proofName.replace(/\s/g, '').toLowerCase()
