@@ -1,5 +1,5 @@
 import dotenv from 'dotenv-safe'
 import { startApp } from './workshop'
 
-dotenv.config()
+dotenv.config({ allowEmptyValues: true })
 startApp()

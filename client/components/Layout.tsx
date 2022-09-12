@@ -51,7 +51,7 @@ export default function Layout({ children }: { children: ReactElement }) {
         <Card.Body>
           <Grid.Container>
             <Grid md={6} css={{ paddingLeft: 20 }}>
-              <Link href='/'>
+              <Link href="/">
                 <Image
                   width={300}
                   height={79}
@@ -79,7 +79,12 @@ export default function Layout({ children }: { children: ReactElement }) {
                     flexDirection: 'row',
                   }}
                 >
-                  <Text h6 size={15} color="white" css={{ m: 0, width: 'auto' }}>
+                  <Text
+                    h6
+                    size={15}
+                    color="white"
+                    css={{ m: 0, width: 'auto' }}
+                  >
                     Credential Definition ID:
                   </Text>
                   &nbsp;
@@ -116,45 +121,7 @@ export default function Layout({ children }: { children: ReactElement }) {
         </Card.Body>
       </Card>
       <Spacer y={1} />
-      <GoHomeSection />
-      <Spacer y={1} />
       {children}
     </Container>
-  )
-}
-
-function GoHomeSection() {
-  const { asPath } = useRouter()
-
-  return (
-    <>
-      { asPath !== '/' &&
-        <Card>
-          <Card.Body
-            css={{
-              display: 'flex',
-              flexDirection: 'row',
-            }}
-          >
-            <Link href='/'>
-              <Button
-                css={{
-                  width: 100,
-                  marginRight: 30,
-                }}
-              >
-                Home
-              </Button>
-            </Link>
-            <Text
-              css={{
-                lineHeight: '40px',
-                letterSpacing: '.8px',
-              }}
-            >{asPath}</Text>
-          </Card.Body>
-        </Card>
-      }
-    </>
   )
 }

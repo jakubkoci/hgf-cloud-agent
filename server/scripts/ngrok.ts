@@ -1,7 +1,7 @@
 import ngrok from 'ngrok'
 import dotenv from 'dotenv-safe'
 
-dotenv.config()
+dotenv.config({ allowEmptyValues: true })
 
 ngrok
   .connect({

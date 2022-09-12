@@ -24,7 +24,7 @@ export function createApp(agent: Agent) {
     asyncHandler(async (req, res) => {
       const agentDid = agent.publicDid
       console.log('request to /did', agentDid)
-      res.send(agentDid)
+      res.status(200).json(agentDid || {})
     })
   )
 
@@ -67,6 +67,26 @@ export function createApp(agent: Agent) {
         schemaId: repository.getSchemaId(),
         credentialDefinitionId: repository.getCredentialDefinitionId(),
       })
+    })
+  )
+
+  app.get(
+    '/register-schema',
+    asyncHandler(async (req, res) => {
+      const template = {
+        attributes: [
+          'Name',
+          'Surname',
+          'Date of Birth',
+          'Event Name',
+          'Event Year',
+        ],
+        name: 'Conference Ticket',
+        version: '1.0',
+      }
+      const schema = await agent.ledger.registerSchema(template)
+      repository.saveSchemaId(schema.id)
+      res.status(200).json({ schema })
     })
   )
 

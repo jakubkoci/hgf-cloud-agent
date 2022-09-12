@@ -9,6 +9,7 @@ import {
   Table,
   Text,
   Grid,
+  Col,
 } from '@nextui-org/react'
 import { useQuery } from '@tanstack/react-query'
 import type { NextPage } from 'next'
@@ -67,7 +68,12 @@ const ConnectionDetail: NextPage = () => {
   return (
     <>
       <Container>
-        <Row justify="space-between" align="center">
+        <Row>
+          <Link css={{ marginRight: 10, display: 'inline' }} href="/">
+            {'Connections'}
+          </Link>
+        </Row>
+        <Row>
           <Text h1>Connection Details</Text>
         </Row>
         <Spacer y={1} />

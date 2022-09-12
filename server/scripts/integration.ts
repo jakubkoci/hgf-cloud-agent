@@ -75,6 +75,7 @@ const agentConfig = {
 }
 
 async function run() {
+  console.log('${cloudAgentUrl}/invitation', `${cloudAgentUrl}/invitation`)
   const agent = await initializeAgent(agentConfig)
   try {
     const invitationUrl = await getInivitationUrl()
