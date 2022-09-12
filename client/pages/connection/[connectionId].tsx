@@ -323,17 +323,26 @@ function ProofRequestDetailsChunk({ details }: { details: ProofRequestModel }) {
     presentationMessage.requested_proof.predicates
   )
   const [predicatesDataMap] = useState<DetailsItemModel[]>(
-    getProofAttrs(predicates)
+    getProofAttrs(predicates, true)
   )
 
-  function getProofAttrs(data: any): DetailsItemModel[] {
+  function getProofAttrs(data: any, isPredicate?: boolean): DetailsItemModel[] {
     let tempRevealedAttrs = []
 
     for (let proofName in data) {
       tempRevealedAttrs.push({
         name: proofName,
-        value: data[proofName].raw,
+        value: isPredicate ? getPredicateValue(proofName) : data[proofName].raw,
       })
+    }
+
+    function getPredicateValue(proofName: string) {
+      const predicatesData = presentationMessage.proof.proofs[0].primary_proof.ge_proofs
+        .filter(item => {
+          return item.predicate.attr_name === proofName.replace(/\s/g, '').toLowerCase()
+        })
+
+      return `${proofName} ${predicatesData[0].predicate.p_type} ${predicatesData[0].predicate.value}`
     }
 
     return tempRevealedAttrs
@@ -374,7 +383,7 @@ function TitledDetails({
               css={{
                 width: '100%',
                 pl: '$6',
-                background: index % 2 == 0 ? '#f9f9f9' : '#fff',
+                background: index % 2 == 0 ? '#f9f9f9' : 'transparent',
                 height: '$15',
               }}
             >
