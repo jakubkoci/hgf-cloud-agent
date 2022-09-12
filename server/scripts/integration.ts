@@ -23,7 +23,7 @@ import {
   pool_transactions_buildernet_genesis,
   pool_transactions_indicio_testnet_genesis,
   pool_transactions_localhost_genesis,
-} from './src/txns'
+} from '../src/txns'
 
 config()
 

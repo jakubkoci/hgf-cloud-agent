@@ -12,7 +12,8 @@
     "test:watch": "yarn test --watchAll",
     "start": "node ./build/src/main.js",
     "start:watch": "nodemon ./src/main.ts",
-    "start:ngrok": "yarn ts-node start-tunnel.ts"
+    "start:ngrok": "yarn ts-node scripts/ngrok.ts",
+    "start:integration": "yarn ts-node scripts/integration.ts"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",

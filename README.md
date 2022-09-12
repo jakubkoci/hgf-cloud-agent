@@ -75,7 +75,7 @@ yarn install
 Now, just open a new terminal window, navigate to `hgf-cloud-agent/server` and run the following command.
 
 ```
-yarn ts-node start-tunnel.ts
+yarn start:ngrok
 ```
 
 It's imporant to keep this terminal windown open and script running all the time during the workshop. Ngrok generates a new URL for each run and you would need to change it in your `.env` and restart cloud agent server.
