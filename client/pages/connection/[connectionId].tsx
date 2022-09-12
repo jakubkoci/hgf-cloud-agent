@@ -14,7 +14,7 @@ import { useQuery } from '@tanstack/react-query'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { cloudAgentUrl } from '../../constants'
-import { get } from '../../utils'
+import { get, sortByDate } from '../../utils'
 import { ReactElement, useState } from 'react'
 
 interface ConnectionModel {
@@ -94,7 +94,7 @@ function CredentialList({ connectionId }: { connectionId: string }) {
       return credentials.filter(
         (credential: CredentialModel) =>
           credential.connectionId === connectionId
-      )
+      ).sort(sortByDate)
     },
     {
       placeholderData: [],
@@ -172,7 +172,7 @@ function ProofList({ connectionId }: { connectionId: string }) {
       const proofs = await get(`${cloudAgentUrl}/proofs`)
       return proofs.filter(
         (proof: ProofRequestModel) => proof.connectionId === connectionId
-      )
+      ).sort(sortByDate)
     },
     {
       placeholderData: [],
