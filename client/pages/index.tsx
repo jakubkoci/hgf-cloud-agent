@@ -13,7 +13,7 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { QRCodeSVG } from 'qrcode.react'
 import { cloudAgentUrl } from '../constants'
-import { fromBase64Url, get, toBase64Url } from '../utils'
+import { fromBase64Url, get, sortByDate, toBase64Url } from '../utils'
 
 interface ConnectionModel {
   id: string
@@ -33,7 +33,10 @@ interface InvitationModel {
 const Connections: NextPage = () => {
   const invitationsQuery = useQuery(
     ['invitations'],
-    () => get(`${cloudAgentUrl}/oobs`),
+    async () => {
+      const connections = await get(`${cloudAgentUrl}/oobs`)
+      return connections.sort(sortByDate)
+    },
     {
       placeholderData: [],
       refetchInterval: 2000,

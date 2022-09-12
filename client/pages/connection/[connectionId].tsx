@@ -14,7 +14,7 @@ import { useQuery } from '@tanstack/react-query'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { cloudAgentUrl } from '../../constants'
-import { get } from '../../utils'
+import { get, sortByDate } from '../../utils'
 import { ReactElement, useState } from 'react'
 
 interface ConnectionModel {
@@ -68,12 +68,39 @@ const ConnectionDetail: NextPage = () => {
     <>
       <Container>
         <Row justify="space-between" align="center">
-          <Text h1>Connection Detail</Text>
+          <Text h1>Connection Details</Text>
         </Row>
         <Spacer y={1} />
 
         <Card>
-          <Card.Body>Details {connection.id}</Card.Body>
+          <Card.Body>
+          <Grid.Container css={{ pl: '$6' }}>
+            <Grid sm={12} md={6}>
+              <Text><strong>Connection ID:</strong> {connection.id}</Text>
+            </Grid>
+            <Grid sm={12} md={6}>
+              <Text><strong>Date:</strong> {connection.createdAt}</Text>
+            </Grid>
+            <Grid sm={12} md={6}>
+              <Text><strong>State:</strong> {connection.state}</Text>
+            </Grid>
+            <Grid sm={12} md={6}>
+              <Text><strong>Role:</strong> {connection.role}</Text>
+            </Grid>
+            <Grid sm={12} md={6}>
+              <Text><strong>Out Of Band ID:</strong> {connection.outOfBandId}</Text>
+            </Grid>
+            <Grid sm={12} md={6}>
+              <Text><strong>Auto Accept Connection:</strong> {connection.autoAcceptConnection ? 'true' : 'false'}</Text>
+            </Grid>
+            <Grid sm={12} md={6}>
+              <Text><strong>Our DID:</strong> {connection.did}</Text>
+            </Grid>
+            <Grid sm={12} md={6}>
+              <Text><strong>Their DID:</strong> {connection.theirDid}</Text>
+            </Grid>
+          </Grid.Container>
+          </Card.Body>
         </Card>
         <Spacer y={1} />
 
@@ -94,7 +121,7 @@ function CredentialList({ connectionId }: { connectionId: string }) {
       return credentials.filter(
         (credential: CredentialModel) =>
           credential.connectionId === connectionId
-      )
+      ).sort(sortByDate)
     },
     {
       placeholderData: [],
@@ -171,7 +198,7 @@ function ProofList({ connectionId }: { connectionId: string }) {
       const proofs = await get(`${cloudAgentUrl}/proofs`)
       return proofs.filter(
         (proof: ProofRequestModel) => proof.connectionId === connectionId
-      )
+      ).sort(sortByDate)
     },
     {
       placeholderData: [],
