@@ -74,32 +74,49 @@ const ConnectionDetail: NextPage = () => {
 
         <Card>
           <Card.Body>
-          <Grid.Container css={{ pl: '$6' }}>
-            <Grid sm={12} md={6}>
-              <Text><strong>Connection ID:</strong> {connection.id}</Text>
-            </Grid>
-            <Grid sm={12} md={6}>
-              <Text><strong>Date:</strong> {connection.createdAt}</Text>
-            </Grid>
-            <Grid sm={12} md={6}>
-              <Text><strong>State:</strong> {connection.state}</Text>
-            </Grid>
-            <Grid sm={12} md={6}>
-              <Text><strong>Role:</strong> {connection.role}</Text>
-            </Grid>
-            <Grid sm={12} md={6}>
-              <Text><strong>Out Of Band ID:</strong> {connection.outOfBandId}</Text>
-            </Grid>
-            <Grid sm={12} md={6}>
-              <Text><strong>Auto Accept Connection:</strong> {connection.autoAcceptConnection ? 'true' : 'false'}</Text>
-            </Grid>
-            <Grid sm={12} md={6}>
-              <Text><strong>Our DID:</strong> {connection.did}</Text>
-            </Grid>
-            <Grid sm={12} md={6}>
-              <Text><strong>Their DID:</strong> {connection.theirDid}</Text>
-            </Grid>
-          </Grid.Container>
+            <Grid.Container css={{ pl: '$6' }}>
+              <Grid sm={12} md={6}>
+                <Text>
+                  <strong>Connection ID:</strong> {connection.id}
+                </Text>
+              </Grid>
+              <Grid sm={12} md={6}>
+                <Text>
+                  <strong>Date:</strong> {connection.createdAt}
+                </Text>
+              </Grid>
+              <Grid sm={12} md={6}>
+                <Text>
+                  <strong>State:</strong> {connection.state}
+                </Text>
+              </Grid>
+              <Grid sm={12} md={6}>
+                <Text>
+                  <strong>Role:</strong> {connection.role}
+                </Text>
+              </Grid>
+              <Grid sm={12} md={6}>
+                <Text>
+                  <strong>Out Of Band ID:</strong> {connection.outOfBandId}
+                </Text>
+              </Grid>
+              <Grid sm={12} md={6}>
+                <Text>
+                  <strong>Auto Accept Connection:</strong>{' '}
+                  {connection.autoAcceptConnection ? 'true' : 'false'}
+                </Text>
+              </Grid>
+              <Grid sm={12} md={6}>
+                <Text>
+                  <strong>Our DID:</strong> {connection.did}
+                </Text>
+              </Grid>
+              <Grid sm={12} md={6}>
+                <Text>
+                  <strong>Their DID:</strong> {connection.theirDid}
+                </Text>
+              </Grid>
+            </Grid.Container>
           </Card.Body>
         </Card>
         <Spacer y={1} />
@@ -118,10 +135,12 @@ function CredentialList({ connectionId }: { connectionId: string }) {
     ['credentials'],
     async () => {
       const credentials = await get(`${cloudAgentUrl}/credentials`)
-      return credentials.filter(
-        (credential: CredentialModel) =>
-          credential.connectionId === connectionId
-      ).sort(sortByDate)
+      return credentials
+        .filter(
+          (credential: CredentialModel) =>
+            credential.connectionId === connectionId
+        )
+        .sort(sortByDate)
     },
     {
       placeholderData: [],
@@ -177,9 +196,11 @@ function CredentialList({ connectionId }: { connectionId: string }) {
                 <Table.Cell>{credential.state}</Table.Cell>
                 <Table.Cell>
                   <Link href="#">
-                    <Button onPress={() => setDetails(credential)}>
-                      Detail
-                    </Button>
+                    {credential.state === 'done' && (
+                      <Button onPress={() => setDetails(credential)}>
+                        Detail
+                      </Button>
+                    )}
                   </Link>
                 </Table.Cell>
               </Table.Row>
@@ -196,9 +217,11 @@ function ProofList({ connectionId }: { connectionId: string }) {
     ['proofs'],
     async () => {
       const proofs = await get(`${cloudAgentUrl}/proofs`)
-      return proofs.filter(
-        (proof: ProofRequestModel) => proof.connectionId === connectionId
-      ).sort(sortByDate)
+      return proofs
+        .filter(
+          (proof: ProofRequestModel) => proof.connectionId === connectionId
+        )
+        .sort(sortByDate)
     },
     {
       placeholderData: [],
@@ -251,9 +274,11 @@ function ProofList({ connectionId }: { connectionId: string }) {
                 <Table.Cell>{proof.createdAt}</Table.Cell>
                 <Table.Cell>{proof.state}</Table.Cell>
                 <Table.Cell>
-                  <Link href="#">
-                    <Button onPress={() => setDetails(proof)}>Detail</Button>
-                  </Link>
+                  {proof.state === 'presentation-received' && (
+                    <Link href="#">
+                      <Button onPress={() => setDetails(proof)}>Detail</Button>
+                    </Link>
+                  )}
                 </Table.Cell>
               </Table.Row>
             )
@@ -307,7 +332,7 @@ function CredentialDetailsChunk({ details }: { details: CredentialModel }) {
 function ProofRequestDetailsChunk({ details }: { details: ProofRequestModel }) {
   const [presentationMessage] = useState(
     JSON.parse(
-      new Buffer(
+      Buffer.from(
         details.presentationMessage['presentations~attach'][0].data.base64,
         'base64'
       ).toString('ascii')
@@ -337,10 +362,15 @@ function ProofRequestDetailsChunk({ details }: { details: ProofRequestModel }) {
     }
 
     function getPredicateValue(proofName: string) {
-      const predicatesData = presentationMessage.proof.proofs[0].primary_proof.ge_proofs
-        .filter(item => {
-          return item.predicate.attr_name === proofName.replace(/\s/g, '').toLowerCase()
-        })
+      const predicatesData =
+        presentationMessage.proof.proofs[0].primary_proof.ge_proofs.filter(
+          (item) => {
+            return (
+              item.predicate.attr_name ===
+              proofName.replace(/\s/g, '').toLowerCase()
+            )
+          }
+        )
 
       return `${proofName} ${predicatesData[0].predicate.p_type} ${predicatesData[0].predicate.value}`
     }
