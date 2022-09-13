@@ -1,8 +1,39 @@
-# HGF AFJ Workshop 2022
+<h1 align="center">How To Build a Self-Sovereign Identity Agent With Hyperledger Aries Framework JavaScript</h1>
+<h4 align="center">14 September 2022 | 09:00 - 12:30</h4>
+<h5 align="center">Jakub Koci, Timo Glastra and Berend Sliedrecht</h5>
+<p align="center">
+<br>
+<br>
+<br>
+<img
+  alt="Hyperledger Aries logo"
+  src="https://raw.githubusercontent.com/hyperledger/aries-framework-javascript/aa31131825e3331dc93694bc58414d955dcb1129/images/aries-logo.png"
+  height="250px"
+/>
+<br>
+<br>
+<br>
+</p>
 
-## Prerequisities
+Link to our discord: https://discord.gg/VkmcsFTH
 
-- Node.js 16+, Docker, Git
+Link to the Hyperledger Global Forum Channel: https://discord.com/channels/905194001349627914/1017366759168286753
+
+## Table of content
+
+- Prerequisites
+- Installation
+- Context
+- Section 1: Agent initialization
+- Section 2: Create an invitation
+- Section 3: Issue a credential
+- Section 4: Request a proof
+
+## Prerequisites
+
+- Node.js 16+ https://nodejs.org/en/download/
+- Git https://git-scm.com
+- Docker
 
 ## Installation
 
@@ -26,19 +57,23 @@ docker build -t hgf-cloud-agent .
 
 ### Download Docker Image
 
-Project structure:
-
-- client: It's NOT an egde agent. It's just UI for cloud agent. React app built with Next.js, no AFJ needed.
-- server: cloud agent, HTTP API, Node.js. Express.js and AFJ.
-
-Why Docker?
-
-## Tutorial
-
-### Initialize Agent
+There is a publicly available Docker image [jakubkoci/hgf-cloud-agent](https://hub.docker.com/repository/docker/jakubkoci/hgf-cloud-agent).
 
 ```
-// TODO 1. Initialize agent: agent config and instance
+docker pull jakubkoci/hgf-cloud-agent:latest
+```
+
+## Context
+
+- Project structure:
+  - client: It's NOT an egde agent. It's just UI for cloud agent. React app built with Next.js, no AFJ needed.
+  - server: cloud agent, HTTP API, Node.js. Express.js and AFJ.
+- Why Docker?
+
+## Section 1: Agent initialization
+
+```
+// TODO Section 1: Agent Initialization (agent instance, config, deps and transports)
 ```
 
 Setup environment variables. There are predefined values in `.env.example` so we can just copy that:
@@ -65,14 +100,14 @@ Verify that the server is running correctly by accessing some endpoints:
 
 - http://localhost:3001 -> Hello, World!
 
-Other useful commands
+Other useful commands:
 
 ```
 docker stop hgf-cloud-agent
 docker start hgf-cloud-agent
 ```
 
-### Make a connection
+## Section 2: Create an invitation
 
 Now it's a good time to start client-side part of our cloud agent. Change directory from `server` to `client`.
 
@@ -95,7 +130,7 @@ yarn dev
 The app should be running at http://localhost:3000.
 
 ```
-// TODO 2. Make a connection
+// TODO Section 2: Create an invitation
 ```
 
 You can Create Invitation in the UI and see what's inside by clicking on Show Invitation.
@@ -124,7 +159,7 @@ Update `.env` and restart the server
 
 - https://2b12-86-49-228-211.ngrok.io -> Hello, World!
 
-### Issue a credential
+## Section 3: Issue a credential
 
 Create public DID
 
@@ -142,15 +177,15 @@ Register public DID:
 Set `PUBLIC_DID_SEED` to `.env.
 
 ```
-// TODO 3. Register a credential definition
+// TODO Section 3: Issue a credential (register a credential definition)
 ```
 
 ```
-// TODO 4. Issue a credential
+// TODO Section 3: Issue a credential
 ```
 
-### Request a proof
+## Section 4: Request a proof
 
 ```
-// TODO 5. Request a proof
+// TODO Section 4: Request a proof
 ```

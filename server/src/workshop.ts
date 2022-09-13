@@ -20,7 +20,7 @@ import { asyncHandler, errorHandler } from './middleware'
 import * as repository from './repository'
 
 export async function startApp(): Promise<void> {
-  // TODO 1. Initialize agent: agent config and instance
+  // TODO Section 1: Agent Initialization (agent config and instance)
 
   const agent = new Agent(
     {
@@ -52,7 +52,7 @@ export async function startApp(): Promise<void> {
   app.get(
     '/invitation',
     asyncHandler(async (req, res) => {
-      // TODO 2. Make a connection
+      // TODO Section 2: Create an invitation
       const outOfBandRecord = await agent.oob.createInvitation()
       const { outOfBandInvitation } = outOfBandRecord
       res.send(outOfBandInvitation.toUrl({ domain: 'https://example.com/ssi' }))
@@ -62,7 +62,7 @@ export async function startApp(): Promise<void> {
   app.get(
     '/register-definition',
     asyncHandler(async (req, res) => {
-      // TODO 3. Register a credential definition
+      // TODO Section 3: Issue a credential (register a credential definition)
       const schemaId = repository.getSchemaId()
       if (!schemaId) throw new Error('Schema ID is missing.')
       const schema = await agent.ledger.getSchema(schemaId)
@@ -84,7 +84,7 @@ export async function startApp(): Promise<void> {
   app.get(
     '/issue-credential/:connectionId',
     asyncHandler(async (req, res) => {
-      // TODO 4. Issue a credential
+      // TODO Section 3: Issue a credential
       const connectionId = req.params.connectionId
       console.log('connectionId', connectionId)
 
@@ -120,7 +120,7 @@ export async function startApp(): Promise<void> {
   app.get(
     '/request-proof/:connectionId',
     asyncHandler(async (req, res) => {
-      // TODO 5. Request a proof
+      // TODO Section 4: Request a proof
       const connectionId = req.params.connectionId
 
       const credentialDefinitionId = repository.getCredentialDefinitionId()
