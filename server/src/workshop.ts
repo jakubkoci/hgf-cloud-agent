@@ -3,6 +3,7 @@ import {
   Agent,
   AttributeFilter,
   AutoAcceptCredential,
+  AutoAcceptProof,
   ConsoleLogger,
   CredentialDefinitionTemplate,
   HttpOutboundTransport,
@@ -31,8 +32,8 @@ export async function startApp(): Promise<void> {
       },
       endpoints: process.env.AGENT_ENDPOINTS?.split(','),
       autoAcceptConnections: true,
-      indyLedgers: [ledgers.bcovrin_greenlight],
       publicDidSeed: process.env.PUBLIC_DID_SEED,
+      indyLedgers: [ledgers.bcovrin_greenlight],
     },
     agentDependencies
   )
@@ -171,11 +172,17 @@ export async function startApp(): Promise<void> {
         }),
       }
 
-      const proofRecord = await agent.proofs.requestProof(connectionId, {
-        name: 'test-proof-request',
-        requestedAttributes: attributes,
-        requestedPredicates: predicates,
-      })
+      const proofRecord = await agent.proofs.requestProof(
+        connectionId,
+        {
+          name: 'Hyperledger Entrance Check',
+          requestedAttributes: attributes,
+          requestedPredicates: predicates,
+        },
+        {
+          autoAcceptProof: AutoAcceptProof.ContentApproved,
+        }
+      )
       res.status(200).json({ proofRecord })
     })
   )

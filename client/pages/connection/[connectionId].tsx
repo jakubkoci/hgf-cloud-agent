@@ -280,7 +280,7 @@ function ProofList({ connectionId }: { connectionId: string }) {
                 <Table.Cell>{proof.createdAt}</Table.Cell>
                 <Table.Cell>{proof.state}</Table.Cell>
                 <Table.Cell>
-                  {proof.state === 'presentation-received' && (
+                  {proof.state === 'done' && (
                     <Link href="#">
                       <Button onPress={() => setDetails(proof)}>Detail</Button>
                     </Link>
