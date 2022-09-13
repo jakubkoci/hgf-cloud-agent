@@ -12,12 +12,7 @@ Clone repository from https://github.com/jakubkoci/hgf-cloud-agent:
 git clone https://github.com/jakubkoci/hgf-cloud-agent.git
 ```
 
-Project structure:
-
-- client: It's NOT an egde agent. It's just UI for cloud agent. React app built with Next.js, no AFJ needed.
-- server: cloud agent, HTTP API, Node.js. Express.js and AFJ.
-
-### Server
+### Build Docker Image
 
 ```
 cd server
@@ -29,18 +24,30 @@ Build a Docker image that contains libindy and node_modules. Then we run this do
 docker build -t hgf-cloud-agent .
 ```
 
+### Download Docker Image
+
+Project structure:
+
+- client: It's NOT an egde agent. It's just UI for cloud agent. React app built with Next.js, no AFJ needed.
+- server: cloud agent, HTTP API, Node.js. Express.js and AFJ.
+
+Why Docker?
+
+## Tutorial
+
+### Initialize Agent
+
+```
+// TODO 1. Initialize agent: agent config and instance
+```
+
 Setup environment variables. There are predefined values in `.env.example` so we can just copy that:
 
 ```
 cp .env.example .env
 ```
 
-We're missing `WALLET_KEY` and `PUBLIC_DID_SEED`. The `WALLET_KEY` can be an arbitrary string. It's used for wallet encryption. For production deployments, it should have enough randomness and must be stored very securely.
-
-The `PUBLIC_DID_SEED` must be 32 characters long string (16 bytes) used to generate DID and verkey.
-
-
-To generate DID and verey from seed we can use [BCovrin Test Indy Network](http://test.bcovrin.vonx.io/). We can then use DID and verkey to register it on Sovrin BuilderNet [Get a Sovrin Network Endorser!](https://selfserve.sovrin.org/). You can check if you registered the DID succesfully in [IndyScan BuilderNet Domain Transaction](https://indyscan.io/txs/SOVRIN_BUILDERNET/domain).
+We're missing `WALLET_KEY`. The `WALLET_KEY` can be an arbitrary string. It's used for wallet encryption. For production deployments, it should have enough randomness and must be stored very securely.
 
 Start server:
 
@@ -56,9 +63,42 @@ docker logs --follow hgf-cloud-agent
 
 Verify that the server is running correctly by accessing some endpoints:
 
-- http://localhost:3001/ -> Hello, World!
-- http://localhost:3001/did -> did and verkey
-- http://localhost:3001/invitation -> [decode base64 invitation](https://codebeautify.org/base64-decode)
+- http://localhost:3001 -> Hello, World!
+
+Other useful commands
+
+```
+docker stop hgf-cloud-agent
+docker start hgf-cloud-agent
+```
+
+### Make a connection
+
+Now it's a good time to start client-side part of our cloud agent. Change directory from `server` to `client`.
+
+```
+cd ../client
+```
+
+Install dependencies
+
+```
+yarn install
+```
+
+Run the app in development mode
+
+```
+yarn dev
+```
+
+The app should be running at http://localhost:3000.
+
+```
+// TODO 2. Make a connection
+```
+
+You can Create Invitation in the UI and see what's inside by clicking on Show Invitation.
 
 Setup Ngrok or local IP
 
@@ -83,33 +123,34 @@ It's imporant to keep this terminal windown open and script running all the time
 Update `.env` and restart the server
 
 - https://2b12-86-49-228-211.ngrok.io -> Hello, World!
-- https://2b12-86-49-228-211.ngrok.io/did -> did and verkey
 
-Other useful commands
+### Issue a credential
 
-```
-docker stop hgf-cloud-agent
-docker start hgf-cloud-agent
-```
+Create public DID
 
-### Client
+- http://localhost:3001/create-did
 
-Change directory from `server` to `client`.
+The public DID seed must be 32 characters long string (16 bytes) and it's used to generate DID and verkey.
 
-```
-cd ../client
-```
+Register public DID:
 
-Install dependencies
+1. [BCovrin Test Indy Network](http://test.bcovrin.vonx.io/)
+2. [GreenLight Ledger Indy Network](http://greenlight.bcovrin.vonx.io/)
+3. [Get An Indicio Network Endorser!](https://selfserve.indiciotech.io/)
+4. [IndyScan BuilderNet Domain Transaction](https://indyscan.io/txs/SOVRIN_BUILDERNET/domain)
 
-```
-yarn install
-```
-
-Run the app in dev mode
+Set `PUBLIC_DID_SEED` to `.env.
 
 ```
-yarn dev
+// TODO 3. Register a credential definition
 ```
 
-The app should be running at http://localhost:3000.
+```
+// TODO 4. Issue a credential
+```
+
+### Request a proof
+
+```
+// TODO 5. Request a proof
+```

@@ -49,8 +49,6 @@ export async function startApp(): Promise<void> {
 
   await agent.initialize()
 
-  // TODO 1. Initialize agent: setup transports
-
   app.get(
     '/invitation',
     asyncHandler(async (req, res) => {
@@ -86,7 +84,7 @@ export async function startApp(): Promise<void> {
   app.get(
     '/issue-credential/:connectionId',
     asyncHandler(async (req, res) => {
-      // TODO 4 Issue a credential
+      // TODO 4. Issue a credential
       const connectionId = req.params.connectionId
       console.log('connectionId', connectionId)
 
