@@ -24,10 +24,10 @@ export async function startApp(): Promise<void> {
 
   const agent = new Agent(
     {
-      label: 'Jakub`s amazing cloud agent.',
+      label: process.env.AGENT_LABEL || '',
       logger: new ConsoleLogger(LogLevel.debug),
       walletConfig: {
-        id: 'jakubs-cloud-agent-wallet',
+        id: process.env.WALLET_NAME || '',
         key: process.env.WALLET_KEY || '',
       },
       endpoints: process.env.AGENT_ENDPOINTS?.split(','),
