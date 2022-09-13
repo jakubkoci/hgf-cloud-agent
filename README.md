@@ -72,17 +72,23 @@ docker pull jakubkoci/hgf-cloud-agent:latest
 
 ## Section 1: Agent initialization
 
+Let's start with `startApp` function and let's look what does it want from us and what we can put into it:
+- label, only required
+- logger, because we're curious
+- walletConfig
+- endpoints, because we can
+
 ```
 // TODO Section 1: Agent Initialization (agent instance, config, deps and transports)
 ```
 
-Setup environment variables. There are predefined values in `.env.example` so we can just copy that:
+The wallet key is quite secret thing (it's actually very secret thing).For production deployments, it should have enough randomness and must be stored very securely. We should not hardcoded into our code.
+
+There is already prepared `.env.example` file containing also other config params, so we can just copy that and update values.
 
 ```
 cp .env.example .env
 ```
-
-We're missing `WALLET_KEY`. The `WALLET_KEY` can be an arbitrary string. It's used for wallet encryption. For production deployments, it should have enough randomness and must be stored very securely.
 
 Start server:
 
@@ -108,6 +114,8 @@ docker start hgf-cloud-agent
 ```
 
 ## Section 2: Create an invitation
+
+### UI
 
 Now it's a good time to start client-side part of our cloud agent. Change directory from `server` to `client`.
 
@@ -135,7 +143,7 @@ The app should be running at http://localhost:3000.
 
 You can Create Invitation in the UI and see what's inside by clicking on Show Invitation.
 
-Setup Ngrok or local IP
+### Setup Ngrok or local IP
 
 As you can see, the invitation contains `localhost` which is only available for agents running on your computer. If an agent is running on different device but in the same local network you can change it to IP address of you device in the local network.
 
