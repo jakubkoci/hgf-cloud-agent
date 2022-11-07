@@ -55,12 +55,30 @@ Build a Docker image that contains libindy and node_modules. Then we run this do
 docker build -t hgf-cloud-agent .
 ```
 
+If you have Apple M1 processor use `Dockerfile.arm`:
+
+```
+docker build -f Dockerfile.arm -t hgf-cloud-agent .
+```
+
 ### Download Docker Image
 
 There is a publicly available Docker image [jakubkoci/hgf-cloud-agent](https://hub.docker.com/repository/docker/jakubkoci/hgf-cloud-agent).
 
 ```
 docker pull jakubkoci/hgf-cloud-agent:latest
+```
+
+### Install Dependencies
+
+```
+yarn
+```
+
+### Build App
+
+```
+yarn build
 ```
 
 ## Context
@@ -126,7 +144,7 @@ cd ../client
 Install dependencies
 
 ```
-yarn install
+yarn
 ```
 
 Run the app in development mode
@@ -150,10 +168,6 @@ As you can see, the invitation contains `localhost` which is only available for 
 A better and recommended option is to use Ngrok. Ngrok gives you publicly accessible HTTP endpoint that works as a proxy to your localhost.
 
 There is short script inside `server` folder that creates ngrok proxy for you. You need to install dependencies.
-
-```
-yarn install
-```
 
 Now, just open a new terminal window, navigate to `hgf-cloud-agent/server` and run the following command.
 
