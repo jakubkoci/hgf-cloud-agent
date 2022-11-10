@@ -91,6 +91,7 @@ yarn build
 ## Section 1: Agent initialization
 
 Let's start with `startApp` function and let's look what does it want from us and what we can put into it:
+
 - label, only required
 - logger, because we're curious
 - walletConfig
@@ -151,6 +152,12 @@ Run the app in development mode
 
 ```
 yarn dev
+```
+
+If you have started `server` on a different port or URL you can set the whole URL as env when starting the app:
+
+```
+CLOUD_AGENT_API_URL=http://localhost:3002 yarn dev
 ```
 
 The app should be running at http://localhost:3000.
