@@ -27,6 +27,22 @@ export async function get(endpoint: string) {
   return json
 }
 
+export async function post(endpoint: string, payload: Record<string, unknown>) {
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  const json = await response.json()
+  if (!response.ok) {
+    throw new Error(JSON.stringify(json, null, 2))
+  }
+  return json
+}
+
 export function sortByDate(a: any, b: any) {
   function getDateStamp(dateString: 'string') {
     return new Date(dateString).valueOf()

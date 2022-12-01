@@ -10,6 +10,7 @@ export function createApp(agent: Agent) {
   const app = express()
   app.use(morgan(':date[iso] :method :url :response-time'))
   app.use(cors())
+  app.use(express.json())
   app.set('json spaces', 2)
 
   app.get(
@@ -95,6 +96,21 @@ export function createApp(agent: Agent) {
     asyncHandler(async (_, res) => {
       const didAndSeed = await createSeed(agent)
       res.status(200).json(didAndSeed)
+    })
+  )
+
+  app.post(
+    '/accept-invitation',
+    asyncHandler(async (req, res) => {
+      console.log('req.body', req.body)
+      const { invitationUrl } = req.body
+      const { outOfBandRecord, connectionRecord } =
+        await agent.oob.receiveInvitationFromUrl(invitationUrl, {
+          alias: 'Test name',
+          autoAcceptInvitation: true,
+          autoAcceptConnection: true,
+        })
+      res.status(200).json({ outOfBandRecord, connectionRecord })
     })
   )
 

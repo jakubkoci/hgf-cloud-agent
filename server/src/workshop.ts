@@ -34,6 +34,8 @@ export async function startApp(): Promise<void> {
       autoAcceptConnections: true,
       publicDidSeed: process.env.PUBLIC_DID_SEED,
       indyLedgers: [ledgers.bcovrin_greenlight],
+      autoAcceptCredentials: AutoAcceptCredential.Always,
+      autoAcceptProofs: AutoAcceptProof.Always,
     },
     agentDependencies
   )
