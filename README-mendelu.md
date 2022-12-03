@@ -157,16 +157,16 @@ Install dependencies
 yarn
 ```
 
-Build the app
+Build the client app for cloud agent server endpoint:
 
 ```
-yarn build
+CLOUD_AGENT_API_URL=http://localhost:3001 yarn build
 ```
 
-Start the app defining cloud-agent server endpoint port 3001 and port of the client app 3000:
+Start the client app defining on a different port than server:
 
 ```
-CLOUD_AGENT_API_URL=http://localhost:3001 yarn start -p 3000
+yarn start -p 3000
 ```
 
 The app should be running at http://localhost:3000.
@@ -203,16 +203,16 @@ Install dependencies
 yarn
 ```
 
-Build the app
+Build the client app for holder agent server endpoint:
 
 ```
-yarn build
+CLOUD_AGENT_API_URL=http://localhost:3003 yarn build
 ```
 
-Start the app defining cloud-agent server endpoint port 3003 and port of the client app 3002:
+Start the client app defining on a different port than server:
 
 ```
-CLOUD_AGENT_API_URL=http://localhost:3003 yarn start -p 3002
+yarn start -p 3002
 ```
 
 The app should be running at http://localhost:3000.
